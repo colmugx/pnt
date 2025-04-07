@@ -1,0 +1,12 @@
+.{
+    .name = .ntm,
+    .version = "0.0.1",
+    .fingerprint = 0xc5589e2f640760ce,
+    .minimum_zig_version = "0.14.0",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

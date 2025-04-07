@@ -1,0 +1,13 @@
+{
+  "is-main": true,
+  "import": [
+    "colmugx/ntm/request",
+    "moonbitlang/x/sys"
+  ],
+  "link": {
+    "native": {
+      "cc": "zig build --release=small --",
+      "cc-flags": ""
+    }
+  }
+}

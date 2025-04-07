@@ -1,0 +1,1 @@
+extern "C" fn curl_get(url : String) -> String = "zig_http_get"

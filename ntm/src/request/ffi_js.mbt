@@ -1,0 +1,1 @@
+extern "js" fn curl_get(url : String) -> String = ""

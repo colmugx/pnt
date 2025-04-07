@@ -1,10 +1,18 @@
 {
   "name": "colmugx/ntm",
   "version": "0.1.0",
+  "deps": {
+    "moonbitlang/x": "0.4.25"
+  },
   "readme": "README.md",
   "repository": "Node Toolkit in MoonBit",
   "license": "MIT",
-  "keywords": ["node", "toolkit", "nvm", "nrm"],
+  "keywords": [
+    "node",
+    "toolkit",
+    "nvm",
+    "nrm"
+  ],
   "description": "",
   "source": "src"
 }
