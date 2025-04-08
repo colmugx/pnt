@@ -1,3 +1,6 @@
 {
-  "import": ["colmugx/ntm/mug"]
+  "import": [
+    "colmugx/ntm/mug",
+    "colmugx/ntm/request"
+  ]
 }

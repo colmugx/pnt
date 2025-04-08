@@ -13,6 +13,10 @@ pub fn App::new(name : String, description : String, cmd~ : String = "") -> App 
   { name, cmd, description, commands: [], version: @util.get_version() }
 }
 
+pub fn App::add_command(self : App, command : Command) -> Unit {
+  self.commands.push(command)
+}
+
 ///|
 pub fn App::register(self : App, cmds : Array[TCmd]) -> Unit {
   let cmds = cmds.map(fn { cmd => Command::new(cmd) })

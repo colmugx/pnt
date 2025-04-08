@@ -1,7 +1,11 @@
 ///|
 type! ParseError String
 
-typealias TAction = () -> Unit
+///|
+pub typealias TArgs = ArrayView[String]
+
+///|
+typealias TAction = (TArgs) -> Unit
 
 ///|
 typealias TCmd = (String, String, TAction)
@@ -33,8 +37,7 @@ fn Command::print_usage(self : Command) -> Unit {
 ///|
 fn Command::execute(self : Command, args : ArrayView[String]) -> Unit {
   println("Executing command: \{self.name}")
-
-  (self.action)()
+  (self.action)(args)
   // let mut i = 1
   // while i < args.length() {
   //   let arg = args[i]
