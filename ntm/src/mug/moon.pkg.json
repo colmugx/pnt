@@ -1,1 +1,5 @@
-{}
+{
+  "import": [
+    "colmugx/ntm/util"
+  ]
+}

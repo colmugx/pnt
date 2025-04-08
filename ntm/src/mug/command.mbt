@@ -1,6 +1,9 @@
 ///|
 type! ParseError String
 
+///|
+typealias TCmd = (String, String)
+
 ///| 命令或子命令
 struct Command {
   name : String
@@ -9,7 +12,8 @@ struct Command {
 }
 
 ///|
-pub fn Command::new(name : String, description : String) -> Command {
+pub fn Command::new(options : TCmd) -> Command {
+  let (name, description) = options
   Command::{ name, description, flags: [] }
 }
 
