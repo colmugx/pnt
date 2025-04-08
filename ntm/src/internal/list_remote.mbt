@@ -28,5 +28,13 @@ fn action(args : @mug.TArgs) -> Unit {
   data
   .iter()
   .fold(init=[], fn { list, item => [item, ..list] })
-  .each(fn { item => println(item.version) })
+  .each(fn {
+    item => {
+      let lts = match item.lts {
+        String(s) => "(\{s})"
+        _ => ""
+      }
+      println("\{item.version} \{lts}")
+    }
+  })
 }
