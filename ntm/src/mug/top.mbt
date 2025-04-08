@@ -1,14 +1,16 @@
 ///|
 struct App {
   name : String
+  cmd : String
   description : String
   commands : Array[Command]
   version : String?
 }
 
 ///|
-pub fn App::new(name : String, description : String) -> App {
-  { name, description, commands: [], version: @util.get_version() }
+pub fn App::new(name : String, description : String, cmd~ : String = "") -> App {
+  let cmd = if cmd.is_empty() { name } else { cmd }
+  { name, cmd, description, commands: [], version: @util.get_version() }
 }
 
 ///|
@@ -54,10 +56,10 @@ fn App::find_command(self : App, name : String) -> Command? {
 ///|
 fn App::print_help(self : App) -> Unit {
   let info =
-    $| \{self.description}
+    $|\{self.description}
     #|
     #|Usage:
-    $| \{self.name} [OPTIONS] <COMMAND>
+    $|  \{self.cmd} [OPTIONS] <COMMAND>
   println(info)
   if not(self.commands.is_empty()) {
     println("\nCommands:")

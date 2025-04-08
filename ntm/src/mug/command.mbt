@@ -1,20 +1,23 @@
 ///|
 type! ParseError String
 
+typealias TAction = () -> Unit
+
 ///|
-typealias TCmd = (String, String)
+typealias TCmd = (String, String, TAction)
 
 ///| 命令或子命令
 struct Command {
   name : String
   description : String
   flags : Array[Flag]
+  action : TAction
 }
 
 ///|
 pub fn Command::new(options : TCmd) -> Command {
-  let (name, description) = options
-  Command::{ name, description, flags: [] }
+  let (name, description, action) = options
+  Command::{ name, description, flags: [], action }
 }
 
 ///|
@@ -30,24 +33,26 @@ fn Command::print_usage(self : Command) -> Unit {
 ///|
 fn Command::execute(self : Command, args : ArrayView[String]) -> Unit {
   println("Executing command: \{self.name}")
-  let mut i = 1
-  while i < args.length() {
-    let arg = args[i]
-    let mut found_flag = false
-    for flag in self.flags {
-      if arg == flag.name {
-        println("  Found flag: --\{flag.name} (\{flag.description})")
-        found_flag = true
-        break
-      } else if flag.short is Some(short) && arg == short {
-        println("  Found flag: -\{short} (\{flag.description})")
-        found_flag = true
-        break
-      }
-    }
-    if not(found_flag) {
-      println("  Warning: Unknown argument '\{arg}'")
-    }
-    i += 1
-  }
+
+  (self.action)()
+  // let mut i = 1
+  // while i < args.length() {
+  //   let arg = args[i]
+  //   let mut found_flag = false
+  //   for flag in self.flags {
+  //     if arg == flag.name {
+  //       println("  Found flag: --\{flag.name} (\{flag.description})")
+  //       found_flag = true
+  //       break
+  //     } else if flag.short is Some(short) && arg == short {
+  //       println("  Found flag: -\{short} (\{flag.description})")
+  //       found_flag = true
+  //       break
+  //     }
+  //   }
+  //   if not(found_flag) {
+  //     println("  Warning: Unknown argument '\{arg}'")
+  //   }
+  //   i += 1
+  // }
 }
