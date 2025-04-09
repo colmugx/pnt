@@ -1,4 +1,9 @@
 {
+  "import": [
+    "colmugx/ntm/request",
+    "moonbitlang/x/fs",
+    "moonbitlang/x/sys"
+  ],
   "pre-build": [
     {
       "input": "../../moon.mod.json",
