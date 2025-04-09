@@ -14,7 +14,7 @@ struct RemoteNode {
 pub let list_remote_cmd : @mug.Command = @mug.Command::new(
   (
     "list-remote", "List all available Node.js versions that can be installed.",
-    action,
+    list_remote_action,
   ),
 )
 
@@ -25,7 +25,7 @@ fn init {
 }
 
 ///|
-fn action(c : @mug.Command, args : @mug.TArgs) -> Unit {
+fn list_remote_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
   let is_lts = c.is_flag_exist(args, "lts")
   let mut list = fetch_list?().or([])
   if is_lts {

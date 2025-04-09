@@ -1,3 +1,3 @@
 # NTM
 
-Node Tool manager devtool in Moonbit
+Node Tool in Moonbit ~~(for Development)~~

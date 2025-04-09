@@ -10,9 +10,9 @@ pub fn execute(app : String, args : ArrayView[String]) -> Unit {
   let app = @mug.App::new(app_config.name, app_config.description)
   app.register([
     ("install", "安装指定版本的 Node.js。", fn(_, _) { println("install") }),
-    ("use", "切换到指定版本的 Node.js。", fn(_, _) { println("use") }),
   ])
 
   app.add_command(list_remote_cmd)
+  app.add_command(use_cmd)
   app.execute(args)
 }
