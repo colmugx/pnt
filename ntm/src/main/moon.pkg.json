@@ -2,7 +2,6 @@
   "is-main": true,
   "import": [
     "colmugx/ntm/internal",
-    // "colmugx/ntm/request",
     "moonbitlang/x/sys"
   ],
   "link": {

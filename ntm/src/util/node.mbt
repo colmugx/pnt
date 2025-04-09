@@ -26,10 +26,36 @@ pub fn get_current_version() -> Unit {
 }
 
 ///|
+pub fn is_version_installed(ver : String) -> Bool {
+  true
+}
+
+///|
 pub fn normalize_version(ver : String) -> String {
   if ver.starts_with("v") {
     ver
   } else {
     "v\{ver}"
   }
+}
+
+///|
+pub fn format_node_tarball(
+  os_tag~ : String,
+  cpu_arch~ : String,
+  version~ : String
+) -> String {
+  "node-\{version}-\{os_tag}-\{cpu_arch}.tar.gz"
+}
+
+///|
+pub fn get_version_dir() -> String {
+  let app_dir = get_app_dir()
+  "\{app_dir}/versions"
+}
+
+///|
+pub fn get_bin_dir() -> String {
+  let app_dir = get_app_dir()
+  "\{app_dir}/bin"
 }

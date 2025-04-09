@@ -8,11 +8,14 @@ priv struct Config {
 pub fn execute(app : String, args : ArrayView[String]) -> Unit {
   let app_config = { name: "ntm", description: "Node Tool in Moonbit" }
   let app = @mug.App::new(app_config.name, app_config.description)
-  app.register([
-    ("install", "安装指定版本的 Node.js。", fn(_, _) { println("install") }),
-  ])
-
   app.add_command(list_remote_cmd)
-  app.add_command(use_cmd)
+  app.add_command(install_cmd)
   app.execute(args)
+}
+
+///|
+fn init {
+  @util.create_dir?(@util.get_app_dir()).unwrap()
+  @util.create_dir?(@util.get_version_dir()).unwrap()
+  @util.create_dir?(@util.get_bin_dir()).unwrap()
 }

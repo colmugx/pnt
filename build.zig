@@ -73,6 +73,8 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
+    exe.addObjectFile(b.path("ntm/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.a"));
+
     exe.linkLibrary(lib);
 
     b.installArtifact(exe);
