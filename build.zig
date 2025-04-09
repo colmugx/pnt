@@ -18,8 +18,8 @@ pub fn build(b: *std.Build) !void {
         .preferred_optimize_mode = .ReleaseSmall,
     });
 
-    const http_mod = b.createModule(.{
-        .root_source_file = b.path("platform/http.zig"),
+    const lib_mod = b.createModule(.{
+        .root_source_file = b.path("platform/root.zig"),
         .target = target,
         .optimize = optimize,
         .sanitize_c = false,
@@ -27,14 +27,14 @@ pub fn build(b: *std.Build) !void {
         .code_model = .small,
     });
 
-    http_mod.addIncludePath(.{
+    lib_mod.addIncludePath(.{
         .cwd_relative = b.pathJoin(&.{
             home_path,
             ".moon/include",
         }),
     });
 
-    http_mod.addCSourceFile(.{
+    lib_mod.addCSourceFile(.{
         .file = .{ .cwd_relative = b.pathJoin(&.{ home_path, ".moon/lib/runtime.c" }) },
         .flags = &.{
             "-Wall",
@@ -43,9 +43,9 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    const http_lib = b.addLibrary(.{
+    const lib = b.addLibrary(.{
         .name = "request",
-        .root_module = http_mod,
+        .root_module = lib_mod,
         .linkage = .dynamic,
     });
 
@@ -73,7 +73,7 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    exe.linkLibrary(http_lib);
+    exe.linkLibrary(lib);
 
     b.installArtifact(exe);
 }

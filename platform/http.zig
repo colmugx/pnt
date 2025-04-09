@@ -1,10 +1,7 @@
 const std = @import("std");
+const util = @import("util.zig");
 const mem = std.mem;
 const http = std.http;
-
-const moonbit = @cImport({
-    @cInclude("moonbit.h");
-});
 
 const Error = error{
     NullPointer,
@@ -13,36 +10,6 @@ const Error = error{
 };
 
 const c_allocator = std.heap.c_allocator;
-
-fn moonbitStringToCStr(str: ?moonbit.moonbit_string_t) ?[]const u8 {
-    if (str == null) return null;
-    // 解包实际的字符串指针
-    const actualStr = str.?;
-    const len: usize = @intCast(moonbit.Moonbit_array_length(actualStr));
-    if (len == 0) return null;
-
-    const allocator = c_allocator;
-    var result = allocator.alloc(u8, len) catch return null;
-    const s = actualStr[0..len];
-    for (s, 0..) |ch, i| {
-        result[i] = @truncate(ch);
-    }
-
-    return result;
-}
-
-fn cStrToMoonbitString(cstr: ?[]u8) !moonbit.moonbit_string_t {
-    if (cstr == null) return Error.ResponseConversionFailed;
-    const s = cstr.?;
-    const len = s.len;
-    var result = moonbit.moonbit_make_string(@intCast(len), 0);
-    if (result == null) return Error.AllocationFailure;
-    const out = result[0..len];
-    for (s[0..len], 0..) |ch, i| {
-        out[i] = @intCast(ch);
-    }
-    return result;
-}
 
 fn makeRequest(method: http.Method, url: ?[]const u8, body: ?[]const u8) ![]u8 {
     if (url == null) return Error.NullPointer;
@@ -85,8 +52,8 @@ fn makeRequest(method: http.Method, url: ?[]const u8, body: ?[]const u8) ![]u8 {
     return result;
 }
 
-export fn zig_http_get(url: moonbit.moonbit_string_t) moonbit.moonbit_string_t {
-    const url_slice = moonbitStringToCStr(url);
+export fn zig_http_get(url: util.moonbit_string_t) util.moonbit_string_t {
+    const url_slice = util.moonbitStringToCStr(url);
     if (url_slice == null) return null;
 
     const response = makeRequest(.GET, url_slice, null) catch {
@@ -95,7 +62,7 @@ export fn zig_http_get(url: moonbit.moonbit_string_t) moonbit.moonbit_string_t {
     };
     c_allocator.free(url_slice.?);
 
-    const moonbit_str = cStrToMoonbitString(response) catch {
+    const moonbit_str = util.cStrToMoonbitString(response) catch {
         c_allocator.free(response);
         return null;
     };
