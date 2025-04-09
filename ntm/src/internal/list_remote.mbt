@@ -1,4 +1,7 @@
 ///|
+priv type! FetchError
+
+///|
 struct RemoteNode {
   version : String
   date : String
@@ -9,7 +12,10 @@ struct RemoteNode {
 
 ///|
 pub let list_remote_cmd : @mug.Command = @mug.Command::new(
-  ("list", "列出已安装的 Node.js 版本。", action),
+  (
+    "list-remote", "List all available Node.js versions that can be installed.",
+    action,
+  ),
 )
 
 ///|
@@ -19,16 +25,13 @@ fn init {
 }
 
 ///|
-fn action(args : @mug.TArgs) -> Unit {
-  let list_url = "https://nodejs.org/dist/index.json"
-  let resp = @request.get(list_url)
-  guard @json.parse?(resp) is Ok(json) else { return }
-  guard @json.from_json?(json) is Ok(data) else { return }
-  let data : Array[RemoteNode] = data
-  data
-  .iter()
-  .fold(init=[], fn { list, item => [item, ..list] })
-  .each(fn {
+fn action(c : @mug.Command, args : @mug.TArgs) -> Unit {
+  let is_lts = c.is_flag_exist(args, "lts")
+  let mut list = fetch_list?().or([])
+  if is_lts {
+    list = list.filter(fn { item => not(item.lts.as_string().or("").is_blank()) })
+  }
+  list.each(fn {
     item => {
       let lts = match item.lts {
         String(s) => "(\{s})"
@@ -37,4 +40,14 @@ fn action(args : @mug.TArgs) -> Unit {
       println("\{item.version} \{lts}")
     }
   })
+}
+
+///|
+fn fetch_list() -> Array[RemoteNode]!FetchError {
+  let list_url = "https://nodejs.org/dist/index.json"
+  let resp = @request.get(list_url)
+  guard @json.parse?(resp) is Ok(json) else { raise FetchError }
+  guard @json.from_json?(json) is Ok(data) else { raise FetchError }
+  let data : Array[RemoteNode] = data
+  data.rev()
 }
