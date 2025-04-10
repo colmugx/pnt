@@ -2,6 +2,8 @@ const std = @import("std");
 const util = @import("util.zig");
 const mem = std.mem;
 const http = std.http;
+const fs = std.fs;
+const io = std.io;
 
 const Error = error{
     NullPointer,
@@ -52,6 +54,55 @@ fn makeRequest(method: http.Method, url: ?[]const u8, body: ?[]const u8) ![]u8 {
     return result;
 }
 
+fn download_file(url: ?[]const u8, file_path: ?[]const u8) !bool {
+    const allocator = std.heap.page_allocator;
+    var client = http.Client{
+        .allocator = allocator,
+    };
+    defer client.deinit();
+
+    const headers = &[_]http.Header{};
+    const uri = try std.Uri.parse(url.?);
+
+    var server_header_buffer: [16 * 1024]u8 = undefined;
+
+    var req = try client.open(.GET, uri, .{
+        .server_header_buffer = &server_header_buffer,
+        .headers = .{
+            .user_agent = .{ .override = "Mozilla/5.0 (Macintosh;) Chrome/134.0.0.0 Safari/537.36" },
+        },
+        .extra_headers = headers,
+    });
+    defer req.deinit();
+    try req.send();
+    try req.finish();
+
+    const file = try fs.createFileAbsolute(
+        file_path.?,
+        .{
+            .read = true,
+            .truncate = true,
+        },
+    );
+    defer file.close();
+
+    // request
+    req.wait() catch |err| {
+        std.debug.print("err: {?}", .{err});
+        return false;
+    };
+
+    var readBuffer: [4096]u8 = undefined;
+
+    while (true) {
+        const bytesRead = try req.read(&readBuffer);
+        if (bytesRead == 0) break;
+        _ = try file.write(readBuffer[0..bytesRead]);
+    }
+
+    return true;
+}
+
 export fn zig_http_get(url: util.moonbit_string_t) util.moonbit_string_t {
     const url_slice = util.moonbitStringToCStr(url);
     if (url_slice == null) return null;
@@ -68,4 +119,19 @@ export fn zig_http_get(url: util.moonbit_string_t) util.moonbit_string_t {
     };
     c_allocator.free(response);
     return moonbit_str;
+}
+
+export fn zig_download_file(url: util.moonbit_string_t, path: util.moonbit_string_t) bool {
+    const url_slice = util.moonbitStringToCStr(url);
+    const path_slice = util.moonbitStringToCStr(path);
+
+    const status = download_file(url_slice, path_slice) catch {
+        c_allocator.free(url_slice.?);
+        c_allocator.free(path_slice.?);
+        return false;
+    };
+    c_allocator.free(url_slice.?);
+    c_allocator.free(path_slice.?);
+
+    return status;
 }

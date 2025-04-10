@@ -15,7 +15,7 @@ const c_allocator = std.heap.c_allocator;
 
 pub fn moonbitStringToCStr(str: ?moonbit.moonbit_string_t) ?[]const u8 {
     if (str == null) return null;
-    // 解包实际的字符串指针
+
     const actualStr = str.?;
     const len: usize = @intCast(moonbit.Moonbit_array_length(actualStr));
     if (len == 0) return null;

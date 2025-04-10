@@ -27,7 +27,7 @@ pub fn get_current_version() -> Unit {
 
 ///|
 pub fn is_version_installed(ver : String) -> Bool {
-  true
+  false
 }
 
 ///|

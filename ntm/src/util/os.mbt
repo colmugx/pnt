@@ -23,6 +23,10 @@ pub fn create_dir(dir : String) -> Unit! {
   if @fs.path_exists(dir) {
     return
   }
-
   @fs.create_dir!(dir)
+}
+
+///|
+pub fn download_file(url : String, file : String) -> Bool {
+  @request.download(url, file)
 }

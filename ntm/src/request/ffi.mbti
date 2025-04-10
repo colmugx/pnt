@@ -1,3 +1,4 @@
 package "colmugx/ntm/request"
 
 fn curl_get(url : String) -> String
+fn download(url : String, file : String) -> Bool
