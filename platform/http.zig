@@ -1,5 +1,6 @@
 const std = @import("std");
 const util = @import("util.zig");
+const os = @import("os.zig");
 const mem = std.mem;
 const http = std.http;
 const fs = std.fs;
@@ -77,14 +78,17 @@ fn download_file(url: ?[]const u8, file_path: ?[]const u8) !bool {
     try req.send();
     try req.finish();
 
-    const file = try fs.createFileAbsolute(
-        file_path.?,
-        .{
-            .read = true,
-            .truncate = true,
-        },
-    );
-    defer file.close();
+    // const file = try fs.createFileAbsolute(
+    //     file_path.?,
+    //     .{
+    //         .read = true,
+    //         .truncate = true,
+    //     },
+    // );
+    // defer file.close();
+
+    var folder = try os.open_folder(file_path.?);
+    defer folder.close();
 
     // request
     req.wait() catch |err| {
@@ -92,13 +96,18 @@ fn download_file(url: ?[]const u8, file_path: ?[]const u8) !bool {
         return false;
     };
 
-    var readBuffer: [4096]u8 = undefined;
+    // var readBuffer: [4096]u8 = undefined;
 
-    while (true) {
-        const bytesRead = try req.read(&readBuffer);
-        if (bytesRead == 0) break;
-        _ = try file.write(readBuffer[0..bytesRead]);
-    }
+    // while (true) {
+    //     const bytesRead = try req.read(&readBuffer);
+    //     if (bytesRead == 0) break;
+    //     _ = try file.write(readBuffer[0..bytesRead]);
+    // }
+
+    var br = std.io.bufferedReaderSize(std.crypto.tls.max_ciphertext_record_len, req.reader());
+    var dcp = std.compress.gzip.decompressor(br.reader());
+
+    try std.tar.pipeToFileSystem(folder, dcp.reader(), .{});
 
     return true;
 }

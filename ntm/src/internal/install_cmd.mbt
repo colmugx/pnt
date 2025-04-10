@@ -51,9 +51,7 @@ fn install_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
   )
   let url = "\{base_url}/\{version}/\{tarball_name}"
   println("Downloading \{url}...")
-  let tarball_file = "\{@util.get_version_dir()}/\{tarball_name}"
-  let is_downloaded = @util.download_file(url, tarball_file)
-
+  let is_downloaded = @util.download_file(url, @util.get_version_dir())
   println(is_downloaded)
   if not(is_downloaded) {
     return
