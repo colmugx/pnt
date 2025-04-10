@@ -4,6 +4,8 @@
 
 NTM (Node Tool in Moonbit) is a fast Node.js version management tool built on Moonbit, similar to `gmn` and `fnm`.
 
+**inspired by [akazwz/gnm](https://github.com/akazwz/gnm)**
+
 (This project is experimental. Do not use it in production.)
 
 ## Main Features
