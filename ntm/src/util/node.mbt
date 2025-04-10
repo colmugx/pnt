@@ -27,11 +27,14 @@ pub fn get_current_version() -> Unit {
 
 ///|
 pub fn is_version_installed(ver : String) -> Bool {
-  false
+  @fs.path_exists("\{get_version_dir()}/\{ver}")
 }
 
 ///|
 pub fn normalize_version(ver : String) -> String {
+  if ver.is_empty() {
+    return ""
+  }
   if ver.starts_with("v") {
     ver
   } else {

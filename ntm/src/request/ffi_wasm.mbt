@@ -1,1 +1,0 @@
-fn curl_get(url : String) -> String = "utils" "http_get"

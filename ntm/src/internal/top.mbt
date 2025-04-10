@@ -10,6 +10,7 @@ pub fn execute(app : String, args : ArrayView[String]) -> Unit {
   let app = @mug.App::new(app_config.name, app_config.description)
   app.add_command(list_remote_cmd)
   app.add_command(install_cmd)
+  app.add_command(use_cmd)
   app.execute(args)
 }
 

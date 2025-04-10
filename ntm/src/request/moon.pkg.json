@@ -1,7 +1,5 @@
 {
   "targets": {
-    "ffi_native.mbt": ["native"],
-    "ffi_wasm.mbt": ["wasm", "wasm-gc"],
-    "ffi_js.mbt": ["js"]
+    "ffi_native.mbt": ["native"]
   }
 }

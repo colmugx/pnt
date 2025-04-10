@@ -84,7 +84,6 @@ fn Command::print_usage(self : Command) -> Unit {
 
 ///|
 fn Command::execute(self : Command, args : TArgs) -> Unit {
-  println("Executing command: \{self.name}")
 
   // TODO: 后续操作
   (self.action)(self, args)

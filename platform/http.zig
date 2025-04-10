@@ -107,7 +107,9 @@ fn download_file(url: ?[]const u8, file_path: ?[]const u8) !bool {
     var br = std.io.bufferedReaderSize(std.crypto.tls.max_ciphertext_record_len, req.reader());
     var dcp = std.compress.gzip.decompressor(br.reader());
 
-    try std.tar.pipeToFileSystem(folder, dcp.reader(), .{});
+    std.debug.print("Extracting...\n", .{});
+
+    try std.tar.pipeToFileSystem(folder, dcp.reader(), .{ .strip_components = 1 });
 
     return true;
 }

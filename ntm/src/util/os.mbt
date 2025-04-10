@@ -30,3 +30,19 @@ pub fn create_dir(dir : String) -> Unit! {
 pub fn download_file(url : String, file : String) -> Bool {
   @request.download(url, file)
 }
+
+///|
+pub fn path_is_exist(path : String) -> Bool {
+  @fs.path_exists(path)
+}
+
+///|
+pub fn replace_symlink(binary : String, version : String) -> Unit {
+  let version_bin_path = "\{get_version_dir()}/\{version}/bin"
+  let target_path = "\{version_bin_path}/\{binary}"
+  let symlink_path = "\{get_bin_dir()}/\{binary}"
+  if @fs.path_exists(symlink_path) {
+    @fs.remove_file?(symlink_path).unwrap()
+  }
+  @request.create_symlink(target_path, symlink_path)
+}

@@ -10,8 +10,8 @@ let install_cmd : @mug.Command = @mug.Command::new(
 fn install_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
   let base_url = "https://nodejs.org/dist"
   let list = @util.fetch_list?().or([])
-  let version = match args {
-    ["lts", ..] => {
+  let version = match args[0] {
+    "lts" => {
       let latest_lts = list
         .iter()
         .find_first(fn {
@@ -26,13 +26,13 @@ fn install_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
       println("Latest LTS version is \{version}")
       version
     }
-    ["latest", ..] => {
+    "latest" => {
       let latest_lts = list[0]
       let version = @util.normalize_version(latest_lts.version)
       println("Latest version is \{version}")
       version
     }
-    _ => ""
+    str => @util.normalize_version(str)
   }
   if version.is_empty() {
     println("Error fetching available versions.")
@@ -50,10 +50,12 @@ fn install_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
     cpu_arch=@util.get_arch(),
   )
   let url = "\{base_url}/\{version}/\{tarball_name}"
-  println("Downloading \{url}...")
-  let is_downloaded = @util.download_file(url, @util.get_version_dir())
-  println(is_downloaded)
+  let dir = "\{@util.get_version_dir()}/\{version}"
+  println("Downloading \{tarball_name}...")
+  let is_downloaded = @util.download_file(url, dir)
   if not(is_downloaded) {
+    println("Error downloading Node.js \{version}.")
     return
   }
+  println("Node.js \{version} installed successfully.")
 }
