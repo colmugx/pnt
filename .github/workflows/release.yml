@@ -11,21 +11,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [macos-latest]
         include:
-          - os: ubuntu-latest
-            platform: linux
           - os: macos-latest
             platform: macos
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Dependencies (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential
       
       - name: Setup Zig
         uses: mlugg/setup-zig@v1
@@ -67,6 +59,5 @@ jobs:
         with:
           files: |
             ntm-macos/*
-            ntm-linux/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
