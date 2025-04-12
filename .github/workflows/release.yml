@@ -34,6 +34,7 @@ jobs:
       - name: Build NTM Binary
         run: |
           cd ntm
+          moon update
           moon build --target native
           cd ..
 
