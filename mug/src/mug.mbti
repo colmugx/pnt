@@ -1,0 +1,32 @@
+package "colmugx/mug"
+
+// Values
+
+// Types and methods
+type App
+impl App {
+  add_command(Self, Command) -> Unit
+  execute(Self, ArrayView[String]) -> Unit
+  new(String, String, cmd~ : String = .., version~ : String?) -> Self
+  register(Self, Array[(String, String, (Command, ArrayView[String]) -> Unit)]) -> Unit
+}
+
+type Command
+impl Command {
+  add_flag(Self, Flag) -> Unit
+  is_flag_exist(Self, ArrayView[String], String) -> Bool
+  new((String, String, (Self, ArrayView[String]) -> Unit)) -> Self
+}
+
+type Flag
+impl Flag {
+  new(String, String, short~ : String? = ..) -> Self
+}
+
+type ParseError
+
+// Type aliases
+pub typealias TArgs = ArrayView[String]
+
+// Traits
+

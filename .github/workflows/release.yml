@@ -47,15 +47,15 @@ jobs:
           name: ntm-${{ matrix.platform }}
           path: dist/*
 
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+  # release:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v4
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ntm-macos/*
+  #     - name: Create Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: |
+  #           ntm-macos/*

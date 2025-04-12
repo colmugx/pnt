@@ -1,0 +1,15 @@
+package "colmugx/ntm/util/ffi"
+
+// Values
+fn create_symlink(String, String) -> Unit
+
+fn download(String, String) -> Bool
+
+fn get(String) -> String
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

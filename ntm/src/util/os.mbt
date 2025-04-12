@@ -28,7 +28,7 @@ pub fn create_dir(dir : String) -> Unit! {
 
 ///|
 pub fn download_file(url : String, file : String) -> Bool {
-  @request.download(url, file)
+  @ffi.download(url, file)
 }
 
 ///|
@@ -44,5 +44,5 @@ pub fn replace_symlink(binary : String, version : String) -> Unit {
   if @fs.path_exists(symlink_path) {
     @fs.remove_file?(symlink_path).unwrap()
   }
-  @request.create_symlink(target_path, symlink_path)
+  @ffi.create_symlink(target_path, symlink_path)
 }
