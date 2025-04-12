@@ -1,5 +1,5 @@
 ///|
-pub fn get(url : String) -> String {
+pub fn get(url : String) -> String? {
   http_get_ffi(url)
 }
 
