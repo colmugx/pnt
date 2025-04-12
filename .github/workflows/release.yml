@@ -31,9 +31,11 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | sh
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
-      - name: Build Binary
+      - name: Build NTM Binary
         run: |
+          cd ntm
           moon build --target native
+          cd ..
 
       - name: Prepare artifacts
         run: |
