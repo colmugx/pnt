@@ -11,16 +11,14 @@ const Error = error{
     StrToMoonbitFailed,
 };
 
-const c_allocator = std.heap.c_allocator;
+pub fn moonbitStringToCStr(allocator: std.mem.Allocator, str: moonbit.moonbit_string_t) ?[]const u8 {
+    const actualStr = str;
+    // 释放 moonbit 引用计数
+    // moonbit.moonbit_decref(str);
 
-pub fn moonbitStringToCStr(str: ?moonbit.moonbit_string_t) ?[]const u8 {
-    if (str == null) return null;
-
-    const actualStr = str.?;
     const len: usize = @intCast(moonbit.Moonbit_array_length(actualStr));
     if (len == 0) return null;
 
-    const allocator = c_allocator;
     var result = allocator.alloc(u8, len) catch return null;
     const s = actualStr[0..len];
     for (s, 0..) |ch, i| {
