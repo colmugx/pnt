@@ -4,7 +4,7 @@
 let resource : String =
   #|{
   #|  "name": "colmugx/ntm",
-  #|  "version": "0.1.0",
+  #|  "version": "0.1.1",
   #|  "deps": {
   #|    "moonbitlang/x": "0.4.25",
   #|    "colmugx/mug": {
