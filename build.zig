@@ -23,8 +23,8 @@ pub fn build(b: *std.Build) !void {
     });
 
     if (target.result.os.tag == .linux) {
-        lib_mod.addSystemIncludePath(.{ .path = "/usr/include" });
-        lib_mod.addSystemIncludePath(.{ .path = "/usr/local/include" });
+        lib_mod.addSystemIncludePath(.{ .cwd_relative = "/usr/include" });
+        lib_mod.addSystemIncludePath(.{ .cwd_relative = "/usr/local/include" });
     }
 
     lib_mod.addIncludePath(.{
