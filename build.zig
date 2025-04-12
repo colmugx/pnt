@@ -22,6 +22,11 @@ pub fn build(b: *std.Build) !void {
         .code_model = .small,
     });
 
+    if (target.result.os.tag == .linux) {
+        lib_mod.addSystemIncludePath(.{ .path = "/usr/include" });
+        lib_mod.addSystemIncludePath(.{ .path = "/usr/local/include" });
+    }
+
     lib_mod.addIncludePath(.{
         .cwd_relative = b.pathJoin(&.{
             home_path,
