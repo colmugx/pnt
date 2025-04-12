@@ -1,5 +1,7 @@
 # NTM
 
+[![Release Build](https://github.com/colmugx/ntm/actions/workflows/release.yml/badge.svg)](https://github.com/colmugx/ntm/actions/workflows/release.yml)
+
 [简体中文](README-zh.md) | [日本語](README-ja.md)
 
 NTM (Node Tool in Moonbit) is a fast Node.js version management tool built on Moonbit, similar to `gmn` and `fnm`.

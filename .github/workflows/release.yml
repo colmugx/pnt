@@ -1,0 +1,67 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    name: Build Binary
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: darwin
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: "0.14.0"
+
+      - name: Setup MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | sh
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Build Binary
+        run: |
+          moon build --target native
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p dist
+          if [ "${{ matrix.platform }}" = "darwin" ]; then
+            cp zig-out/bin/ntm dist/ntm-${{ matrix.platform }}-aarch64
+          else
+            cp zig-out/bin/ntm dist/ntm-${{ matrix.platform }}-x86_64
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ntm-${{ matrix.platform }}
+          path: dist/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ntm-darwin/*
+            ntm-linux/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
