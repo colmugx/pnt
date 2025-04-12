@@ -16,7 +16,7 @@ jobs:
           - os: ubuntu-latest
             platform: linux
           - os: macos-latest
-            platform: darwin
+            platform: macos
 
     steps:
       - uses: actions/checkout@v4
@@ -41,11 +41,7 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir -p dist
-          if [ "${{ matrix.platform }}" = "darwin" ]; then
-            cp zig-out/bin/ntm dist/ntm-${{ matrix.platform }}-aarch64
-          else
-            cp zig-out/bin/ntm dist/ntm-${{ matrix.platform }}-x86_64
-          fi
+          cp zig-out/bin/ntm dist/ntm
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -64,7 +60,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ntm-darwin/*
+            ntm-macos/*
             ntm-linux/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

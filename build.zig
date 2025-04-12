@@ -8,12 +8,7 @@ pub fn build(b: *std.Build) !void {
 
     const home_path = envmap.get("HOME").?;
 
-    const target = b.standardTargetOptions(.{
-        .default_target = .{
-            .cpu_arch = .aarch64,
-            .os_tag = .macos,
-        },
-    });
+    const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{
         .preferred_optimize_mode = .ReleaseSmall,
     });
