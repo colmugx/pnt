@@ -6,8 +6,16 @@ let use_cmd : @mug.Command = @mug.Command::new(
   ),
 )
 
+///| 替换 Node.js 相关工具的软链接
+fn replace_node_symlinks(version : String) -> Unit {
+  let tools = ["node", "npm", "npx"]
+  for tool in tools {
+    @util.replace_symlink(tool, version)
+  }
+}
+
 ///|
-fn use_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
+fn use_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
   let list = @util.fetch_list?().or([])
   let version = match args[0] {
     "lts" => {
@@ -50,11 +58,7 @@ fn use_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
     println("Node binary not found in \{node_bin}")
     return
   }
-
-  // 替换软链
-  @util.replace_symlink("node", version)
-  @util.replace_symlink("npm", version)
-  @util.replace_symlink("npx", version)
+  replace_node_symlinks(version)
   println(
     $|Now using Node.js \{version}
     #|Add this to your shell profile to use ntm:

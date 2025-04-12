@@ -6,7 +6,10 @@ let resource : String =
   #|  "name": "colmugx/ntm",
   #|  "version": "0.1.0",
   #|  "deps": {
-  #|    "moonbitlang/x": "0.4.25"
+  #|    "moonbitlang/x": "0.4.25",
+  #|    "colmugx/mug": {
+  #|      "path": "../mug"
+  #|    }
   #|  },
   #|  "readme": "README.md",
   #|  "repository": "Node Toolkit in MoonBit",

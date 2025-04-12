@@ -1,9 +1,11 @@
 ///| 选项或标志
 struct Flag {
-  long_name : String
-  stort_name : String
-  usage : String
+  name : String
+  short : String?
   description : String
-  has_value : Bool
 }
 
+///|
+pub fn Flag::new(name : String, description : String, short~ : String? = None) -> Flag {
+  { name, short, description }
+}

@@ -13,21 +13,20 @@ fn init {
 }
 
 ///|
-fn list_remote_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
-  let is_lts = c.is_flag_exist(args, "lts")
-  let mut list = @util.fetch_list?().or([]).rev()
-  if is_lts {
-    list = list.filter(fn {
-      item => not(item.lts.as_string().or("").is_blank())
+fn format_version(item : @util.RemoteNode) -> String {
+  let lts = item.lts.as_string().map_or("", fn { s => "(\{s})" })
+  "\{item.version} \{lts}"
+}
+
+///|
+fn list_remote_action(cmd : @mug.Command, args : @mug.TArgs) -> Unit {
+  let list = @util.fetch_list?().or([]).rev()
+  let filtered = if cmd.is_flag_exist(args, "lts") {
+    list.filter(fn {
+      item => item.lts.as_string().map_or(false, fn { s => not(s.is_empty()) })
     })
+  } else {
+    list
   }
-  list.each(fn {
-    item => {
-      let lts = match item.lts {
-        String(s) => "(\{s})"
-        _ => ""
-      }
-      println("\{item.version} \{lts}")
-    }
-  })
+  filtered.each(fn { item => println(format_version(item)) })
 }

@@ -6,20 +6,15 @@ let install_cmd : @mug.Command = @mug.Command::new(
   ),
 )
 
-///|
-fn install_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
-  let base_url = "https://nodejs.org/dist"
-  let list = @util.fetch_list?().or([])
-  let version = match args[0] {
+///| 获取版本号
+fn get_version(version_arg : String, list : Array[@util.RemoteNode]) -> String {
+  match version_arg {
     "lts" => {
       let latest_lts = list
         .iter()
         .find_first(fn {
           item =>
-            match item.lts.as_string() {
-              None => false
-              Some(_) => true
-            }
+            item.lts.as_string().map_or(false, fn { s => not(s.is_empty()) })
         })
         .unwrap()
       let version = @util.normalize_version(latest_lts.version)
@@ -27,13 +22,19 @@ fn install_action(c : @mug.Command, args : @mug.TArgs) -> Unit {
       version
     }
     "latest" => {
-      let latest_lts = list[0]
-      let version = @util.normalize_version(latest_lts.version)
+      let version = @util.normalize_version(list[0].version)
       println("Latest version is \{version}")
       version
     }
     str => @util.normalize_version(str)
   }
+}
+
+///|
+fn install_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
+  let base_url = "https://nodejs.org/dist"
+  let list = @util.fetch_list?().or([])
+  let version = get_version(args[0], list)
   if version.is_empty() {
     println("Error fetching available versions.")
     return

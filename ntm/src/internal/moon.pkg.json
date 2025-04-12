@@ -1,6 +1,6 @@
 {
   "import": [
-    "colmugx/ntm/mug",
+    "colmugx/mug",
     "colmugx/ntm/util"
   ]
 }
