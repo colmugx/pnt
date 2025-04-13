@@ -27,7 +27,7 @@ pub fn create_dir(dir : String) -> Unit! {
 }
 
 ///|
-pub fn download_file(url : String, file : String) -> Bool {
+pub fn download_file(url : String, file : String) -> Unit? {
   @ffi.download(url, file)
 }
 

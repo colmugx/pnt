@@ -1,7 +1,4 @@
 ///|
-type! ParseError String
-
-///|
 pub typealias TArgs = ArrayView[String]
 
 ///|

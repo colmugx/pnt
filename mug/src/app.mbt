@@ -1,7 +1,6 @@
 ///|
 struct App {
   name : String
-  cmd : String
   description : String
   commands : Array[Command]
   version : String?
@@ -11,11 +10,9 @@ struct App {
 pub fn App::new(
   name : String,
   description : String,
-  cmd~ : String = "",
-  version~ : String?
+  version~ : String? = None
 ) -> App {
-  let cmd = if cmd.is_empty() { name } else { cmd }
-  { name, cmd, description, commands: [], version }
+  { name, description, commands: [], version }
 }
 
 ///|
@@ -38,6 +35,7 @@ pub fn App::execute(self : App, args : ArrayView[String]) -> Unit {
   let cmd_name = args[0]
   match cmd_name {
     "--help" | "-h" => self.print_help()
+    "--version" | "-v" => self.print_version()
     _ => {
       guard self.find_command(cmd_name) is Some(cmd) else { self.print_help() }
       self.handle_command_help(cmd, args[1:])
@@ -69,7 +67,7 @@ fn App::print_help(self : App) -> Unit {
     $|\{self.description}
     #|
     #|Usage:
-    $|  \{self.cmd} [OPTIONS] <COMMAND>
+    $|  \{self.name} [OPTIONS] <COMMAND>
   println(info)
   if not(self.commands.is_empty()) {
     println("\nCommands:")
@@ -77,4 +75,9 @@ fn App::print_help(self : App) -> Unit {
       cmd.print_usage()
     }
   }
+}
+
+///|
+fn App::print_version(self : App) -> Unit {
+  println(self.version.or("0.0.0"))
 }

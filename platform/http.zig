@@ -92,7 +92,7 @@ fn makeRequest(allocator: std.mem.Allocator, method: http.Method, url: []const u
     return result;
 }
 
-fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target_dir_path: []const u8) !bool {
+fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target_dir_path: []const u8) !void {
     var client = http.Client{
         .allocator = allocator,
     };
@@ -185,8 +185,6 @@ fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target
         std.log.err("Generic error during tar extraction", .{});
         return HttpError.ArchiveExtractionFailed;
     };
-
-    return true;
 }
 
 export fn zig_http_get(url: util.moonbit_string_t) util.moonbit_string_t {
@@ -203,7 +201,7 @@ export fn zig_http_get(url: util.moonbit_string_t) util.moonbit_string_t {
     return moonbit_str;
 }
 
-export fn zig_download_file(url: util.moonbit_string_t, path: util.moonbit_string_t) bool {
+export fn zig_download_file(url: util.moonbit_string_t, path: util.moonbit_string_t) void {
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
@@ -211,7 +209,5 @@ export fn zig_download_file(url: util.moonbit_string_t, path: util.moonbit_strin
     const url_slice = util.moonbitStringToCStr(allocator, url);
     const path_slice = util.moonbitStringToCStr(allocator, path);
 
-    const status = downloadAndExtractTarGz(allocator, url_slice.?, path_slice.?) catch return false;
-
-    return status;
+    downloadAndExtractTarGz(allocator, url_slice.?, path_slice.?) catch return;
 }

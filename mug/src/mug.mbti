@@ -7,7 +7,7 @@ type App
 impl App {
   add_command(Self, Command) -> Unit
   execute(Self, ArrayView[String]) -> Unit
-  new(String, String, cmd~ : String = .., version~ : String?) -> Self
+  new(String, String, version~ : String? = ..) -> Self
   register(Self, Array[(String, String, (Command, ArrayView[String]) -> Unit)]) -> Unit
 }
 
@@ -22,8 +22,6 @@ type Flag
 impl Flag {
   new(String, String, short~ : String? = ..) -> Self
 }
-
-type ParseError
 
 // Type aliases
 pub typealias TArgs = ArrayView[String]

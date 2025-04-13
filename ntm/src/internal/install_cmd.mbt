@@ -53,8 +53,7 @@ fn install_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
   let url = "\{base_url}/\{version}/\{tarball_name}"
   let dir = "\{@util.get_version_dir()}/\{version}"
   println("Downloading \{tarball_name}...")
-  let is_downloaded = @util.download_file(url, dir)
-  if not(is_downloaded) {
+  guard @util.download_file(url, dir) is Some(_) else {
     println("Error downloading Node.js \{version}.")
     return
   }

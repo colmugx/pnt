@@ -4,7 +4,7 @@ pub fn get(url : String) -> String? {
 }
 
 ///|
-pub fn download(url : String, file : String) -> Bool {
+pub fn download(url : String, file : String) -> Unit? {
   download_file_ffi(url, file)
 }
 
