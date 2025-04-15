@@ -42,3 +42,24 @@ pub fn cStrToMoonbitBytes(cstr: ?[]u8) !moonbit.moonbit_bytes_t {
     @memcpy(result[0..len], str);
     return result;
 }
+
+export fn zig_print(str: moonbit.moonbit_string_t) callconv(.C) void {
+    if (str == 0) return;
+    defer moonbit.moonbit_decref(str);
+
+    var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    const len = moonbit.Moonbit_array_length(str);
+    if (len == 0) {
+        return;
+    }
+
+    const result = allocator.alloc(u8, len) catch return;
+    for (str[0..len], result) |ch, *b| {
+        b.* = @truncate(ch);
+    }
+
+    std.debug.print("\r{s}\x1b[K", .{result});
+}

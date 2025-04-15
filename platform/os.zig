@@ -22,7 +22,7 @@ pub fn create_symlink(
 }
 
 // export
-export fn zig_create_symlink(target: util.moonbit_bytes_t, symlink: util.moonbit_bytes_t) void {
+export fn zig_create_symlink(target: util.moonbit_bytes_t, symlink: util.moonbit_bytes_t) callconv(.C) void {
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();

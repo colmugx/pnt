@@ -6,6 +6,39 @@ const http = std.http;
 const fs = std.fs;
 const io = std.io;
 
+const ProgressReader = struct {
+    inner_reader: http.Client.Request.Reader,
+    bytes_downloaded: u64 = 0,
+    total_size: u64,
+    callback: ?*const fn (u64, u64) void,
+
+    pub const ReadError = http.Client.Request.Reader.Error;
+    pub const Error = ReadError || error{OutOfMemory};
+    pub const Reader = io.Reader(*Self, Error, read);
+
+    const Self = @This();
+
+    pub fn read(self: *Self, buf: []u8) Error!usize {
+        const bytes_read = self.inner_reader.read(buf) catch |err| return err;
+
+        if (bytes_read > 0) {
+            self.bytes_downloaded += bytes_read;
+
+            if (self.callback) |cb| {
+                cb(
+                    self.bytes_downloaded,
+                    self.total_size,
+                );
+            }
+        }
+        return bytes_read;
+    }
+
+    pub fn reader(self: *Self) Reader {
+        return .{ .context = self };
+    }
+};
+
 const HttpError = error{
     // --- 输入/配置错误 ---
     /// URL 格式无效
@@ -92,7 +125,12 @@ fn makeRequest(allocator: std.mem.Allocator, method: http.Method, url: []const u
     return result;
 }
 
-fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target_dir_path: []const u8) !void {
+fn downloadAndExtractTarGz(
+    allocator: std.mem.Allocator,
+    url: []const u8,
+    target_dir_path: []const u8,
+    callback: ?*const fn (u64, u64) void,
+) !void {
     var client = http.Client{
         .allocator = allocator,
     };
@@ -140,15 +178,6 @@ fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target
         else => return HttpError.HttpRequestSendFailed,
     };
 
-    // const file = try fs.createFileAbsolute(
-    //     file_path.?,
-    //     .{
-    //         .read = true,
-    //         .truncate = true,
-    //     },
-    // );
-    // defer file.close();
-
     // 等待响应头
     req.wait() catch |err| switch (err) {
         error.HttpHeadersInvalid => return HttpError.HttpHeaderParseFailed,
@@ -165,21 +194,17 @@ fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target
         return HttpError.HttpStatusNotSuccess;
     }
 
+    var progress_reader = ProgressReader{
+        .inner_reader = req.reader(),
+        .total_size = req.response.content_length orelse 0,
+        .callback = callback,
+    };
+
     var folder = try os.open_folder(target_dir_path);
     defer folder.close();
 
-    // var readBuffer: [4096]u8 = undefined;
-
-    // while (true) {
-    //     const bytesRead = try req.read(&readBuffer);
-    //     if (bytesRead == 0) break;
-    //     _ = try file.write(readBuffer[0..bytesRead]);
-    // }
-
-    var br = std.io.bufferedReaderSize(std.crypto.tls.max_ciphertext_record_len, req.reader());
+    var br = std.io.bufferedReaderSize(std.crypto.tls.max_ciphertext_record_len, progress_reader.reader());
     var dcp = std.compress.gzip.decompressor(br.reader());
-
-    std.debug.print("Extracting...\n", .{});
 
     std.tar.pipeToFileSystem(folder, dcp.reader(), .{ .strip_components = 1 }) catch {
         std.log.err("Generic error during tar extraction", .{});
@@ -187,7 +212,7 @@ fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target
     };
 }
 
-export fn zig_http_get(url: util.moonbit_bytes_t) util.moonbit_bytes_t {
+export fn zig_http_get(url: util.moonbit_bytes_t) callconv(.C) util.moonbit_bytes_t {
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
@@ -201,7 +226,7 @@ export fn zig_http_get(url: util.moonbit_bytes_t) util.moonbit_bytes_t {
     return moonbit_str;
 }
 
-export fn zig_download_file(url: util.moonbit_bytes_t, path: util.moonbit_bytes_t) void {
+export fn zig_download_file(url: util.moonbit_bytes_t, path: util.moonbit_bytes_t, callback: ?*const fn (u64, u64) void) callconv(.C) void {
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
@@ -209,5 +234,5 @@ export fn zig_download_file(url: util.moonbit_bytes_t, path: util.moonbit_bytes_
     const url_slice = util.moonbitBytesToCStr(allocator, url) catch return;
     const path_slice = util.moonbitBytesToCStr(allocator, path) catch return;
 
-    downloadAndExtractTarGz(allocator, url_slice, path_slice) catch return;
+    downloadAndExtractTarGz(allocator, url_slice, path_slice, callback) catch return;
 }
