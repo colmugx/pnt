@@ -187,27 +187,27 @@ fn downloadAndExtractTarGz(allocator: std.mem.Allocator, url: []const u8, target
     };
 }
 
-export fn zig_http_get(url: util.moonbit_string_t) util.moonbit_string_t {
+export fn zig_http_get(url: util.moonbit_bytes_t) util.moonbit_bytes_t {
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const url_slice = util.moonbitStringToCStr(allocator, url);
+    const url_slice = util.moonbitBytesToCStr(allocator, url) catch return null;
 
-    const response = makeRequest(allocator, .GET, url_slice.?, null) catch return null;
+    const response = makeRequest(allocator, .GET, url_slice, null) catch return null;
 
-    const moonbit_str = util.cStrToMoonbitString(response) catch return null;
+    const moonbit_str = util.cStrToMoonbitBytes(response) catch return null;
 
     return moonbit_str;
 }
 
-export fn zig_download_file(url: util.moonbit_string_t, path: util.moonbit_string_t) void {
+export fn zig_download_file(url: util.moonbit_bytes_t, path: util.moonbit_bytes_t) void {
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const url_slice = util.moonbitStringToCStr(allocator, url);
-    const path_slice = util.moonbitStringToCStr(allocator, path);
+    const url_slice = util.moonbitBytesToCStr(allocator, url) catch return;
+    const path_slice = util.moonbitBytesToCStr(allocator, path) catch return;
 
-    downloadAndExtractTarGz(allocator, url_slice.?, path_slice.?) catch return;
+    downloadAndExtractTarGz(allocator, url_slice, path_slice) catch return;
 }

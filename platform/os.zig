@@ -22,15 +22,13 @@ pub fn create_symlink(
 }
 
 // export
-export fn zig_create_symlink(target: util.moonbit_string_t, symlink: util.moonbit_string_t) void {
+export fn zig_create_symlink(target: util.moonbit_bytes_t, symlink: util.moonbit_bytes_t) void {
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const target_slice = util.moonbitStringToCStr(allocator, target);
-    const symlink_slice = util.moonbitStringToCStr(allocator, symlink);
+    const target_slice = util.moonbitBytesToCStr(allocator, target) catch return;
+    const symlink_slice = util.moonbitBytesToCStr(allocator, symlink) catch return;
 
-    create_symlink(target_slice.?, symlink_slice.?) catch {
-        return;
-    };
+    create_symlink(target_slice, symlink_slice) catch return;
 }

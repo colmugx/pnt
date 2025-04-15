@@ -1,4 +1,7 @@
 {
+  "import": [
+    "moonbitlang/x/encoding"
+  ],
   "targets": {
     "ffi_native.mbt": ["native"]
   }

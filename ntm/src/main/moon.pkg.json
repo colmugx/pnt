@@ -1,7 +1,7 @@
 {
   "is-main": true,
   "import": [
-    "colmugx/ntm/internal",
+    "colmugx/ntm/lib",
     "moonbitlang/x/sys"
   ],
   "link": {

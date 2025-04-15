@@ -1,11 +1,11 @@
-package "colmugx/ntm/util/ffi"
+package "colmugx/ntm/util/internal/ffi"
 
 // Values
 fn create_symlink(String, String) -> Unit
 
-fn download(String, String) -> Bool
+fn download(String, String) -> Unit?
 
-fn get(String) -> String
+fn get(String) -> String?
 
 // Types and methods
 

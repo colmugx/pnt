@@ -7,7 +7,7 @@ import(
 // Values
 fn create_dir(String) -> Unit!
 
-fn download_file(String, String) -> Bool
+fn download_file(String, String) -> Unit?
 
 fn fetch_list() -> Array[RemoteNode]!FetchError
 
