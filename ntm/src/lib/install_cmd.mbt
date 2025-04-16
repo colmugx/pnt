@@ -43,11 +43,9 @@ fn install_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
     println("Node.js \{version} is already installed.")
     return
   }
-
-  // TODO: 获取系统
   let tarball_name = @util.format_node_tarball(
     version~,
-    os_tag="darwin",
+    os_tag=@util.get_os(),
     cpu_arch=@util.get_arch(),
   )
   let url = "\{base_url}/\{version}/\{tarball_name}"

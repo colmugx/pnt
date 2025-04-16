@@ -1,9 +1,4 @@
 ///|
-pub fn get_arch() -> String {
-  @ffi.get_arch()
-}
-
-///|
 pub fn get_home() -> String {
   let env_map = @sys.get_env_vars()
   env_map.get("HOME").or("")
@@ -42,4 +37,14 @@ pub fn replace_symlink(binary : String, version : String) -> Unit {
     @fs.remove_file?(symlink_path).unwrap()
   }
   @ffi.create_symlink(target_path, symlink_path)
+}
+
+///|
+pub fn get_arch() -> String {
+  @ffi.get_arch()
+}
+
+///|
+pub fn get_os() -> String {
+  @ffi.get_os()
 }

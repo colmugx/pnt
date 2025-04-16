@@ -11,24 +11,15 @@ const Error = error{
     StrToMoonbitFailed,
 };
 
-pub fn moonbitBytesToCStr(allocator: std.mem.Allocator, str: moonbit.moonbit_bytes_t) ![]const u8 {
+pub fn moonbitBytesToCStr(str: moonbit.moonbit_bytes_t) ![]const u8 {
     if (str == 0) return Error.MoonbitToStrFailed;
-
-    defer moonbit.moonbit_decref(str);
 
     const len = moonbit.Moonbit_array_length(str);
     if (len == 0) {
         return Error.MoonbitToStrFailed;
     }
 
-    const result = allocator.alloc(u8, len) catch |err| {
-        std.debug.print("moonbit bytes to zig string error: {?}", .{err});
-        return Error.MoonbitToStrFailed;
-    };
-
-    @memcpy(result, str[0..len]);
-
-    return result;
+    return str[0..len];
 }
 
 pub fn cStrToMoonbitBytes(cstr: ?[]u8) !moonbit.moonbit_bytes_t {
@@ -45,7 +36,6 @@ pub fn cStrToMoonbitBytes(cstr: ?[]u8) !moonbit.moonbit_bytes_t {
 
 export fn zig_print(str: moonbit.moonbit_string_t) callconv(.C) void {
     if (str == 0) return;
-    defer moonbit.moonbit_decref(str);
 
     var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();

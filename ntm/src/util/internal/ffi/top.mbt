@@ -31,3 +31,8 @@ pub fn create_symlink(target : String, symlink : String) -> Unit {
 pub fn get_arch() -> String {
   bytes_dencode_to_string(get_arch_ffi().or_default()).or_default()
 }
+
+///|
+pub fn get_os() -> String {
+  bytes_dencode_to_string(get_os_ffi().or_default()).or_default()
+}

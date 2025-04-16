@@ -217,7 +217,7 @@ export fn zig_http_get(url: util.moonbit_bytes_t) callconv(.C) util.moonbit_byte
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const url_slice = util.moonbitBytesToCStr(allocator, url) catch return null;
+    const url_slice = util.moonbitBytesToCStr(url) catch return null;
 
     const response = makeRequest(allocator, .GET, url_slice, null) catch return null;
 
@@ -231,8 +231,8 @@ export fn zig_download_file(url: util.moonbit_bytes_t, path: util.moonbit_bytes_
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const url_slice = util.moonbitBytesToCStr(allocator, url) catch return;
-    const path_slice = util.moonbitBytesToCStr(allocator, path) catch return;
+    const url_slice = util.moonbitBytesToCStr(url) catch return;
+    const path_slice = util.moonbitBytesToCStr(path) catch return;
 
     downloadAndExtractTarGz(allocator, url_slice, path_slice, callback) catch return;
 }

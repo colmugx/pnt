@@ -24,12 +24,8 @@ pub fn create_symlink(
 
 // export
 export fn zig_create_symlink(target: util.moonbit_bytes_t, symlink: util.moonbit_bytes_t) callconv(.C) void {
-    var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
-    defer arena.deinit();
-    const allocator = arena.allocator();
-
-    const target_slice = util.moonbitBytesToCStr(allocator, target) catch return;
-    const symlink_slice = util.moonbitBytesToCStr(allocator, symlink) catch return;
+    const target_slice = util.moonbitBytesToCStr(target) catch return;
+    const symlink_slice = util.moonbitBytesToCStr(symlink) catch return;
 
     create_symlink(target_slice, symlink_slice) catch return;
 }
@@ -44,10 +40,23 @@ export fn zig_get_arch() callconv(.C) util.moonbit_bytes_t {
         else => return null,
     };
 
-    const buf = std.heap.c_allocator.allocSentinel(u8, str.len, 0) catch return null;
-    defer std.heap.c_allocator.free(buf);
+    const result = util.moonbit_make_bytes(str.len, 0);
+    @memcpy(result[0..str.len], str);
 
-    @memcpy(buf[0..str.len], str);
+    return result;
+}
 
-    return util.cStrToMoonbitBytes(buf) catch return null;
+export fn zig_get_os() callconv(.C) util.moonbit_bytes_t {
+    const os_tag = builtin.os.tag;
+    const str = switch (os_tag) {
+        .windows => "win",
+        .macos => "darwin",
+        .linux => "linux",
+        else => return null,
+    };
+
+    const result = util.moonbit_make_bytes(str.len, 0);
+    @memcpy(result[0..str.len], str);
+
+    return result;
 }

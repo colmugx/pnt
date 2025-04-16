@@ -3,7 +3,10 @@ const std = @import("std");
 pub fn build(b: *std.Build) !void {
     b.release_mode = .small;
 
-    const allocator = std.heap.page_allocator;
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
     const envmap = try std.process.getEnvMap(allocator);
 
     const home_path = envmap.get("HOME").?;
