@@ -45,6 +45,8 @@ export fn zig_get_arch() callconv(.C) util.moonbit_bytes_t {
     };
 
     const buf = std.heap.c_allocator.allocSentinel(u8, str.len, 0) catch return null;
+    defer std.heap.c_allocator.free(buf);
+
     @memcpy(buf[0..str.len], str);
 
     return util.cStrToMoonbitBytes(buf) catch return null;
