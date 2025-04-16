@@ -1,14 +1,11 @@
 ///|
 pub fn execute(_ : String, args : ArrayView[String]) -> Unit {
-  let app = @mug.App::new(
-    "ntm",
-    "Node Tool in Moonbit",
-    version=@util.get_version(),
-  )
-  app.add_command(list_remote_cmd)
-  app.add_command(install_cmd)
-  app.add_command(use_cmd)
-  app.execute(args)
+  @mug.App::new("ntm", "Node Tool in Moonbit", version=@util.get_version())
+  ..add_command(list_remote_cmd)
+  ..add_command(install_cmd)
+  ..add_command(use_cmd)
+  ..add_command(uninstall_cmd)
+  .execute(args)
 }
 
 ///|

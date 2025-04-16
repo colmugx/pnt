@@ -1,13 +1,15 @@
 ///|
 pub fn get(url : String) -> String? {
-  guard http_get_ffi(encoding(url)) is Some(res) else { None }
-  guard @encoding.decoder(@encoding.UTF8).decode?(res) is Ok(s) else { None }
-  Some(s)
+  guard http_get_ffi(string_encode_to_bytes(url)) is Some(res) else { None }
+  bytes_dencode_to_string(res)
 }
 
 ///|
 pub fn download(url : String, file : String) -> Unit? {
-  download_file_ffi(encoding(url), encoding(file), fn(current, total) {
+  download_file_ffi(string_encode_to_bytes(url), string_encode_to_bytes(file), fn(
+    current,
+    total
+  ) {
     print_ffi(
       "Downloading: \{sprint(current.to_double()/total.to_double(), 2)}%",
     )
@@ -19,20 +21,13 @@ pub fn download(url : String, file : String) -> Unit? {
 
 ///|
 pub fn create_symlink(target : String, symlink : String) -> Unit {
-  create_symlink_ffi(encoding(target), encoding(symlink))
+  create_symlink_ffi(
+    string_encode_to_bytes(target),
+    string_encode_to_bytes(symlink),
+  )
 }
 
 ///|
-fn encoding(str : String) -> Bytes {
-  @encoding.encode(@encoding.UTF8, str)
-}
-
-///|
-fn sprint(num : Double, digits : Int) -> Double {
-  if num == 0 {
-    num
-  } else {
-    let base = 100.00
-    (num * base.pow(digits.to_double())).floor() / base
-  }
+pub fn get_arch() -> String {
+  bytes_dencode_to_string(get_arch_ffi().or_default()).or_default()
 }

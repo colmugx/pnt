@@ -7,6 +7,8 @@ fn download(String, String) -> Unit?
 
 fn get(String) -> String?
 
+fn get_arch() -> String
+
 // Types and methods
 
 // Type aliases

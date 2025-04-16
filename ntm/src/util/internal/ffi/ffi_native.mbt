@@ -13,3 +13,5 @@ extern "C" fn create_symlink_ffi(target : Bytes, symlink : Bytes) -> Unit = "zig
 
 ///|
 extern "C" fn print_ffi(str : String) -> Unit = "zig_print"
+
+extern "C" fn get_arch_ffi() -> Bytes? = "zig_get_arch"
