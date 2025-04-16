@@ -23,6 +23,8 @@ fn get_current_version() -> Unit
 
 fn get_home() -> String
 
+fn get_os() -> String
+
 fn get_version() -> String?
 
 fn get_version_dir() -> String

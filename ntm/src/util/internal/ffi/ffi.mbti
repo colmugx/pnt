@@ -9,6 +9,8 @@ fn get(String) -> String?
 
 fn get_arch() -> String
 
+fn get_os() -> String
+
 // Types and methods
 
 // Type aliases
