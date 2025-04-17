@@ -21,6 +21,11 @@ pub fn fetch_list() -> Array[RemoteNode]!FetchError {
 }
 
 ///|
+pub fn list_node() -> Array[String] {
+  @fs.read_dir?(get_version_dir()).or([])
+}
+
+///|
 pub fn get_current_version() -> String? {
   let path = "\{get_bin_dir()}/node"
   let ori_path = @ffi.read_link(path)
