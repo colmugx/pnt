@@ -19,7 +19,7 @@ fn get_arch() -> String
 
 fn get_bin_dir() -> String
 
-fn get_current_version() -> Unit
+fn get_current_version() -> String?
 
 fn get_home() -> String
 
@@ -36,6 +36,8 @@ fn normalize_version(String) -> String
 fn path_is_exist(String) -> Bool
 
 fn read_config() -> Json!ReadModError
+
+fn remove_by_version(String) -> Unit!
 
 fn replace_symlink(String, String) -> Unit
 

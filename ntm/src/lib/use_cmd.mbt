@@ -51,6 +51,8 @@ fn use_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
     )
     return
   }
+
+  // TODO
   let node_bin = "\{@util.get_version_dir()}/\{version}/bin/node"
 
   // 检查二进制执行

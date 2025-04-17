@@ -21,13 +21,23 @@ pub fn fetch_list() -> Array[RemoteNode]!FetchError {
 }
 
 ///|
-pub fn get_current_version() -> Unit {
-
+pub fn get_current_version() -> String? {
+  let path = "\{get_bin_dir()}/node"
+  let ori_path = @ffi.read_link(path)
+  ori_path
+  .split("/")
+  .find_first(fn { item => item is ['v', c, ..] && c.is_ascii_digit() })
 }
 
 ///|
 pub fn is_version_installed(ver : String) -> Bool {
   @fs.path_exists("\{get_version_dir()}/\{ver}")
+}
+
+///|
+pub fn remove_by_version(ver : String) -> Unit! {
+  let path = "\{get_version_dir()}/\{ver}"
+  @ffi.remove_dir!(path)
 }
 
 ///|

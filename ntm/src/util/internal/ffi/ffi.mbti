@@ -11,6 +11,10 @@ fn get_arch() -> String
 
 fn get_os() -> String
 
+fn read_link(String) -> String
+
+fn remove_dir(String) -> Unit!
+
 // Types and methods
 
 // Type aliases
