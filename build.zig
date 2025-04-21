@@ -101,6 +101,7 @@ pub fn build(b: *std.Build) !void {
 
     // Linux 下需要手动链接 math 库
     if (target.result.os.tag == .linux) {
+        exe.linkLibC();
         exe.linkSystemLibrary("m");
     }
 
