@@ -52,7 +52,7 @@ fn parse_flags(self : Command, args : TArgs) -> Map[String, String] {
   let mut i = 0
   while i < args.length() {
     let arg = args[i]
-    if arg.starts_with("--") {
+    if arg.has_prefix("--") {
       let start = arg.offset_of_nth_char(2).unwrap()
       let end = arg.offset_of_nth_char(arg.length() - 1).unwrap()
       let long = arg.view(start_offset=start, end_offset=end + 1).to_string()
@@ -61,7 +61,7 @@ fn parse_flags(self : Command, args : TArgs) -> Map[String, String] {
       } else {
         // Unknown flag
       }
-    } else if arg.starts_with("-") && arg.length() > 1 {
+    } else if arg.has_prefix("-") && arg.length() > 1 {
       let short = arg[1].to_string()
       guard self.s_flags.get(short) is Some(long) else {
         // Unknown flag

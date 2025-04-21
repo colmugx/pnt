@@ -50,7 +50,7 @@ pub fn normalize_version(ver : String) -> String {
   if ver.is_empty() {
     return ""
   }
-  if ver.starts_with("v") {
+  if ver.has_prefix("v") {
     ver
   } else {
     "v\{ver}"
