@@ -6,22 +6,12 @@ on:
       - "v*"
 
 jobs:
-  build:
-    name: Build Binary
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-        include:
-          - os: macos-latest
-            platform: macos
-          - os: ubuntu-latest
-            platform: linux
-
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Zig
         uses: mlugg/setup-zig@v1
         with:
@@ -47,12 +37,78 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ntm-${{ matrix.platform }}
+          name: ntm-macos
           path: dist/*
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build-essential
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: "0.14.0"
+
+      - name: Setup MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Build NTM Binary
+        run: |
+          cd ntm
+          moon update
+          moon build --target native
+          cd ..
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p dist
+          cp zig-out/bin/ntm dist/ntm
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ntm-linux
+          path: dist/*
+
+  # build-windows:
+  #   name: Build Windows
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup Zig
+  #       uses: mlugg/setup-zig@v1
+  #       with:
+  #         version: "0.14.0"
+  #     - name: Setup MoonBit
+  #       run: |
+  #         curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+  #         echo "$HOME/.moon/bin" >> $GITHUB_PATH
+  #     - name: Build NTM Binary
+  #       run: |
+  #         cd ntm
+  #         moon update
+  #         moon build --target native
+  #         cd ..
+  #     - name: Prepare artifacts
+  #       run: |
+  #         mkdir -p dist
+  #         cp zig-out/bin/ntm dist/ntm.exe
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ntm-windows
+  #         path: dist/*
 
   release:
     name: Create Release
-    needs: build
+    needs: [build-macos, build-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
