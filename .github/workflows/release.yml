@@ -47,7 +47,15 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install build-essential
-        run: sudo apt-get update && sudo apt-get install -y build-essential
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Verify math.h location
+        run: |
+          echo "Searching for math.h..."
+          ls -l /usr/include/math.h || echo "math.h not found in /usr/include"
+          find /usr/include -name math.h
 
       - name: Setup Zig
         uses: mlugg/setup-zig@v1

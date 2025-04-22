@@ -31,6 +31,8 @@ fn get_version_dir() -> String
 
 fn is_version_installed(String) -> Bool
 
+fn list_node() -> Array[String]
+
 fn normalize_version(String) -> String
 
 fn path_is_exist(String) -> Bool
