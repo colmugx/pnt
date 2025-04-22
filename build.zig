@@ -65,6 +65,12 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
+    // Linux 下需要手动链接 math 库
+    if (target.result.os.tag == .linux) {
+        lib_mod.link_libc = true;
+        lib_mod.linkSystemLibrary("m");
+    }
+
     const lib = b.addLibrary(.{
         .name = "request",
         .root_module = lib_mod,
@@ -98,12 +104,6 @@ pub fn build(b: *std.Build) !void {
     exe.addObjectFile(b.path("ntm/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.a"));
 
     exe.linkLibrary(lib);
-
-    // Linux 下需要手动链接 math 库
-    if (target.result.os.tag == .linux) {
-        exe.linkLibC();
-        exe.linkSystemLibrary("m");
-    }
 
     b.installArtifact(exe);
 }
