@@ -86,13 +86,17 @@ pub fn build(b: *std.Build) !void {
         .linkage = .static,
     });
 
-    // Linux 下需要手动链接 math 库
-    if (target.result.os.tag != .macos) {
-        lib.linkLibC();
-    }
-
-    if (target.result.os.tag == .linux) {
-        lib.linkSystemLibrary("m");
+    switch (target.result.os.tag) {
+        .windows => {
+            lib.linkLibC();
+            lib.linkSystemLibrary("crypt32");
+            lib.linkSystemLibrary("ws2_32");
+        },
+        .linux => {
+            lib.linkLibC();
+            lib.linkSystemLibrary("m");
+        },
+        else => {},
     }
 
     const exe = b.addExecutable(.{
