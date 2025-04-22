@@ -119,7 +119,11 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    exe.addObjectFile(b.path("ntm/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.a"));
+    if (target.result.os.tag == .windows) {
+        exe.addObjectFile(b.path("ntm/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.lib"));
+    } else {
+        exe.addObjectFile(b.path("ntm/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.a"));
+    }
 
     exe.linkLibrary(lib);
 
