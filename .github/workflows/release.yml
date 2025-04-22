@@ -104,6 +104,7 @@ jobs:
         run: |
           Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
           irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
+          echo "$env:USERPROFILE\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
 
       - name: Build NTM Binary
         run: |
@@ -138,9 +139,31 @@ jobs:
       - name: List downloaded files
         run: ls -R artifacts
 
+      - name: Zip macOS artifact
+        run: |
+          cd artifacts
+          for d in ntm-macos-*; do
+            zip -j "${d}.zip" "$d/ntm"
+          done
+
+      - name: Zip linux artifact
+        run: |
+          cd artifacts
+          for d in ntm-linux-*; do
+            zip -j "${d}.zip" "$d/ntm"
+          done
+
+      # - name: Zip windows artifact
+      #   run: |
+      #     cd artifacts
+      #     for d in ntm-windows-*; do
+      #       zip -j "${d}.zip" "$d/ntm.exe"
+      #     done
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/ntm-macos-*
-            artifacts/ntm-linux-*
+            artifacts/ntm-macos-*.zip
+            artifacts/ntm-linux-*.zip
+          # artifacts/ntm-windows-*.zip
