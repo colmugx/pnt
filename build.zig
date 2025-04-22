@@ -2,6 +2,10 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) !void {
     b.release_mode = .small;
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{
+        .preferred_optimize_mode = .ReleaseSmall,
+    });
 
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
@@ -9,9 +13,8 @@ pub fn build(b: *std.Build) !void {
 
     const envmap = try std.process.getEnvMap(allocator);
 
-    const os_tag = std.builtin.os.tag;
     const home_path = blk: {
-        if (os_tag == .windows) {
+        if (target.result.os.tag == .windows) {
             if (envmap.get("USERPROFILE")) |userprofile| {
                 break :blk userprofile;
             } else {
@@ -27,11 +30,6 @@ pub fn build(b: *std.Build) !void {
             }
         }
     };
-
-    const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{
-        .preferred_optimize_mode = .ReleaseSmall,
-    });
 
     const allowed = blk: {
         const os = target.result.os.tag;
