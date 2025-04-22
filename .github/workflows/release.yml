@@ -19,6 +19,7 @@ jobs:
         uses: mlugg/setup-zig@main
         with:
           version: "0.14.0"
+          use-cache: false
 
       - name: Setup MoonBit
         run: |
@@ -38,9 +39,11 @@ jobs:
           cp zig-out/bin/ntm dist/ntm
 
       - name: Upload artifacts
+        env:
+          ARCH: ${{ runner.arch }}
         uses: actions/upload-artifact@v4
         with:
-          name: ntm-macos
+          name: ntm-macos-${{ env.ARCH }}
           path: dist/*
 
   build-linux:
@@ -54,16 +57,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential
 
-      - name: Verify math.h location
-        run: |
-          echo "Searching for math.h..."
-          ls -l /usr/include/math.h || echo "math.h not found in /usr/include"
-          find /usr/include -name math.h
-
       - name: Setup Zig
         uses: mlugg/setup-zig@main
         with:
           version: "0.14.0"
+          use-cache: false
 
       - name: Setup MoonBit
         run: |
@@ -83,39 +81,49 @@ jobs:
           cp zig-out/bin/ntm dist/ntm
 
       - name: Upload artifacts
+        env:
+          ARCH: ${{ runner.arch }}
         uses: actions/upload-artifact@v4
         with:
-          name: ntm-linux
+          name: ntm-linux-${{ env.ARCH }}
           path: dist/*
 
-  # build-windows:
-  #   name: Build Windows
-  #   runs-on: windows-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Setup Zig
-  #       uses: mlugg/setup-zig@v1
-  #       with:
-  #         version: "0.14.0"
-  #     - name: Setup MoonBit
-  #       run: |
-  #         curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-  #         echo "$HOME/.moon/bin" >> $GITHUB_PATH
-  #     - name: Build NTM Binary
-  #       run: |
-  #         cd ntm
-  #         moon update
-  #         moon build --target native
-  #         cd ..
-  #     - name: Prepare artifacts
-  #       run: |
-  #         mkdir -p dist
-  #         cp zig-out/bin/ntm dist/ntm.exe
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ntm-windows
-  #         path: dist/*
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@main
+        with:
+          version: "0.14.0"
+          use-cache: false
+
+      - name: Setup MoonBit
+        run: |
+          Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+          irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
+
+      - name: Build NTM Binary
+        run: |
+          cd ntm
+          moon update
+          moon build --target native
+          cd ..
+
+      - name: Prepare artifacts
+        run: |
+          mkdir dist
+          Copy-Item zig-out\bin\ntm.exe dist\ntm.exe
+
+      - name: Upload artifacts
+        env:
+          ARCH: ${{ runner.arch }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ntm-windows-${{ env.ARCH }}
+          path: dist/*
 
   release:
     name: Create Release
@@ -127,7 +135,12 @@ jobs:
         with:
           path: artifacts
 
+      - name: List downloaded files
+        run: ls -R artifacts
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/**/*
+          files: |
+            artifacts/ntm-macos-*
+            artifacts/ntm-linux-*
