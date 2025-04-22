@@ -1,5 +1,8 @@
 name: Release Build
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
@@ -13,10 +16,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Zig
-        uses: mlugg/setup-zig@v1
+        uses: mlugg/setup-zig@main
         with:
           version: "0.14.0"
-          use-cache: false
 
       - name: Setup MoonBit
         run: |
@@ -59,10 +61,9 @@ jobs:
           find /usr/include -name math.h
 
       - name: Setup Zig
-        uses: mlugg/setup-zig@v1
+        uses: mlugg/setup-zig@main
         with:
           version: "0.14.0"
-          use-cache: false
 
       - name: Setup MoonBit
         run: |
