@@ -87,8 +87,11 @@ pub fn build(b: *std.Build) !void {
     });
 
     // Linux 下需要手动链接 math 库
-    if (target.result.os.tag == .linux) {
+    if (target.result.os.tag != .macos) {
         lib.linkLibC();
+    }
+
+    if (target.result.os.tag == .linux) {
         lib.linkSystemLibrary("m");
     }
 
