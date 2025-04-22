@@ -65,17 +65,17 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    // Linux 下需要手动链接 math 库
-    if (target.result.os.tag == .linux) {
-        lib_mod.link_libc = true;
-        lib_mod.linkSystemLibrary("m");
-    }
-
     const lib = b.addLibrary(.{
         .name = "request",
         .root_module = lib_mod,
         .linkage = .static,
     });
+
+    // Linux 下需要手动链接 math 库
+    if (target.result.os.tag == .linux) {
+        lib.linkLibC();
+        lib.linkSystemLibrary("m");
+    }
 
     const exe = b.addExecutable(.{
         .name = "ntm",
