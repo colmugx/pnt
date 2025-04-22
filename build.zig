@@ -9,7 +9,24 @@ pub fn build(b: *std.Build) !void {
 
     const envmap = try std.process.getEnvMap(allocator);
 
-    const home_path = envmap.get("HOME").?;
+    const os_tag = std.builtin.os.tag;
+    const home_path = blk: {
+        if (os_tag == .windows) {
+            if (envmap.get("USERPROFILE")) |userprofile| {
+                break :blk userprofile;
+            } else {
+                std.debug.print("USERPROFILE environment variable not set\n", .{});
+                return error.MissingUserProfile;
+            }
+        } else {
+            if (envmap.get("HOME")) |home| {
+                break :blk home;
+            } else {
+                std.debug.print("HOME environment variable not set\n", .{});
+                return error.MissingHome;
+            }
+        }
+    };
 
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{
