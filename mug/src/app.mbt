@@ -1,9 +1,27 @@
-///|
-struct App {
+///| 
+pub(open) trait TApplication {
+  execute(Self, ArrayView[String]) -> Unit
+  add_command(Self, Command) -> Unit
+  version(Self) -> String?
+}
+
+///| 
+pub trait AppHelpPrinter {
+  print_help(Self) -> Unit
+  print_version(Self) -> Unit
+}
+
+///| 
+pub trait CommandManager {
+  find_command(Self, String) -> Command?
+}
+
+///| 
+pub struct App {
   name : String
   description : String
   commands : Array[Command]
-  version : String?
+  ver : String?
 }
 
 ///|
@@ -12,22 +30,11 @@ pub fn App::new(
   description : String,
   version~ : String? = None
 ) -> App {
-  { name, description, commands: [], version }
+  { name, description, commands: [], ver: version }
 }
 
 ///|
-pub fn App::add_command(self : App, command : Command) -> Unit {
-  self.commands.push(command)
-}
-
-///|
-pub fn App::register(self : App, cmds : Array[TCmd]) -> Unit {
-  let cmds = cmds.map(fn { cmd => Command::new(cmd) })
-  self.commands.append(cmds)
-}
-
-///|
-pub fn App::execute(self : App, args : ArrayView[String]) -> Unit {
+pub impl TApplication for App with execute(self, args : ArrayView[String]) {
   if args.length() == 0 {
     self.print_help()
     return
@@ -37,32 +44,32 @@ pub fn App::execute(self : App, args : ArrayView[String]) -> Unit {
     "--help" | "-h" => self.print_help()
     "--version" | "-v" => self.print_version()
     _ => {
-      guard self.find_command(cmd_name) is Some(cmd) else { self.print_help() }
-      self.handle_command_help(cmd, args[1:])
+      guard self.find_command(cmd_name) is Some(cmd) else {
+        self.print_help()
+        return
+      }
+      let args = args[1:]
+      if args.length() != 0 && (args[0] == "--help" || args[0] == "-h") {
+        cmd.print_usage()
+        return
+      }
+      cmd.execute(args)
     }
   }
 }
 
 ///|
-fn App::handle_command_help(
-  _ : App,
-  command : Command,
-  args : ArrayView[String]
-) -> Unit {
-  if args.length() != 0 && (args[0] == "--help" || args[0] == "-h") {
-    command.print_usage()
-  } else {
-    command.execute(args)
-  }
+pub impl TApplication for App with add_command(self, command : Command) -> Unit {
+  self.commands.push(command)
 }
 
 ///|
-fn App::find_command(self : App, name : String) -> Command? {
-  self.commands.iter().find_first(fn { cmd => cmd.name == name })
+pub impl TApplication for App with version(self) -> String? {
+  self.ver
 }
 
 ///|
-fn App::print_help(self : App) -> Unit {
+impl AppHelpPrinter for App with print_help(self) {
   let info =
     $|\{self.description}
     #|
@@ -78,6 +85,22 @@ fn App::print_help(self : App) -> Unit {
 }
 
 ///|
-fn App::print_version(self : App) -> Unit {
-  println(self.version.or("0.0.0"))
+impl AppHelpPrinter for App with print_version(self) {
+  println(self.ver.or("0.0.0"))
+}
+
+///|
+impl CommandManager for App with find_command(self, name : String) {
+  self.commands.iter().find_first(fn { cmd => cmd.name() == name })
+}
+
+///| 注册新命令的简便方法
+pub fn App::register(
+  self : App,
+  cmds : Array[(String, String, TAction)]
+) -> Unit {
+  let cmds = cmds.map(fn {
+    (name, desc, action) => Command::new(name, desc, action)
+  })
+  self.commands.append(cmds)
 }

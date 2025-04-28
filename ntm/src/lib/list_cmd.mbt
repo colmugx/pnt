@@ -1,9 +1,7 @@
 ///|
 let list_cmd : @mug.Command = @mug.Command::new(
-  (
     "list", "List all installed Node.js versions, showing the currently active version.",
     list_action,
-  ),
 )
 
 ///|

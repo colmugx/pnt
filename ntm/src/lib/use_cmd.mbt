@@ -1,9 +1,7 @@
 ///|
 let use_cmd : @mug.Command = @mug.Command::new(
-  (
-    "use", "Switch to a specific version of Node.js. If version is \"lts\", the latest installed LTS version will be used.",
-    use_action,
-  ),
+  "use", "Switch to a specific version of Node.js. If version is \"lts\", the latest installed LTS version will be used.",
+  use_action,
 )
 
 ///| 替换 Node.js 相关工具的软链接

@@ -3,20 +3,29 @@ package "colmugx/mug"
 // Values
 
 // Types and methods
-type App
+pub struct App {
+  name : String
+  description : String
+  commands : Array[Command]
+  ver : String?
+}
 impl App {
-  add_command(Self, Command) -> Unit
-  execute(Self, ArrayView[String]) -> Unit
   new(String, String, version~ : String? = ..) -> Self
   register(Self, Array[(String, String, (Command, ArrayView[String]) -> Unit)]) -> Unit
 }
+impl TApplication for App
 
-type Command
-impl Command {
-  add_flag(Self, Flag) -> Unit
-  is_flag_exist(Self, ArrayView[String], String) -> Bool
-  new((String, String, (Self, ArrayView[String]) -> Unit)) -> Self
+pub struct Command {
+  name : String
+  description : String
+  flags : Map[String, Flag]
+  s_flags : Map[String, String]
+  action : (Command, ArrayView[String]) -> Unit
 }
+impl Command {
+  new(String, String, (Self, ArrayView[String]) -> Unit) -> Self
+}
+impl TFlaggable for Command
 
 type Flag
 impl Flag {
@@ -27,4 +36,37 @@ impl Flag {
 pub typealias TArgs = ArrayView[String]
 
 // Traits
+pub trait AppHelpPrinter {
+  print_help(Self) -> Unit
+  print_version(Self) -> Unit
+}
+
+pub trait CommandManager {
+  find_command(Self, String) -> Command?
+}
+
+pub trait FlagParser {
+  parse_flags(Self, ArrayView[String]) -> Map[String, String]
+}
+
+pub trait HelpPrinter {
+  print_usage(Self) -> Unit
+}
+
+pub(open) trait TApplication {
+  execute(Self, ArrayView[String]) -> Unit
+  add_command(Self, Command) -> Unit
+  version(Self) -> String?
+}
+
+pub(open) trait TCommand {
+  execute(Self, ArrayView[String]) -> Unit
+  name(Self) -> String
+  description(Self) -> String
+}
+
+pub(open) trait TFlaggable {
+  has_flag(Self, ArrayView[String], String) -> Bool
+  add_flag(Self, Flag) -> Unit
+}
 

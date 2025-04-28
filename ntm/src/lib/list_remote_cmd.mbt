@@ -1,9 +1,6 @@
 ///|
 let list_remote_cmd : @mug.Command = @mug.Command::new(
-  (
-    "list-remote", "List all available Node.js versions that can be installed.",
-    list_remote_action,
-  ),
+  "list-remote", "List all available Node.js versions that can be installed.", list_remote_action,
 )
 
 ///|
@@ -21,7 +18,7 @@ fn format_version(item : @util.RemoteNode) -> String {
 ///|
 fn list_remote_action(cmd : @mug.Command, args : @mug.TArgs) -> Unit {
   let list = @util.fetch_list?().or([]).rev()
-  let filtered = if cmd.is_flag_exist(args, "lts") {
+  let filtered = if cmd.has_flag(args, "lts") {
     list.filter(fn {
       item => item.lts.as_string().map_or(false, fn { s => not(s.is_empty()) })
     })

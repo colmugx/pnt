@@ -1,9 +1,7 @@
 ///|
 let install_cmd : @mug.Command = @mug.Command::new(
-  (
-    "install", "Install a specific version of Node.js. If version is \"lts\", the latest LTS version will be installed.",
-    install_action,
-  ),
+  "install", "Install a specific version of Node.js. If version is \"lts\", the latest LTS version will be installed.",
+  install_action,
 )
 
 ///| 获取版本号

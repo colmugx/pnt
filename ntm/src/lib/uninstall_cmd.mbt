@@ -1,6 +1,6 @@
 ///|
 let uninstall_cmd : @mug.Command = @mug.Command::new(
-  ("uninstall", "Uninstall a specific version of Node.js.", uninstall_action),
+  "uninstall", "Uninstall a specific version of Node.js.", uninstall_action,
 )
 
 ///|
