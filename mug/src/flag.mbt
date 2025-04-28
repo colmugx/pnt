@@ -1,5 +1,5 @@
 ///| 选项或标志
-struct Flag {
+pub struct Flag {
   name : String
   short : String?
   description : String

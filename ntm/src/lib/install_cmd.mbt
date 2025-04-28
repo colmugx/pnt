@@ -1,8 +1,8 @@
 ///|
-let install_cmd : @mug.Command = @mug.Command::new(
-  "install", "Install a specific version of Node.js. If version is \"lts\", the latest LTS version will be installed.",
-  install_action,
-)
+priv struct InstallCmd {
+  name : String
+  description : String
+}
 
 ///| 获取版本号
 fn get_version(version_arg : String, list : Array[@util.RemoteNode]) -> String {
@@ -29,7 +29,7 @@ fn get_version(version_arg : String, list : Array[@util.RemoteNode]) -> String {
 }
 
 ///|
-fn install_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
+impl @mug.TCommand for InstallCmd with execute(_, args) {
   let base_url = "https://nodejs.org/dist"
   let list = @util.fetch_list?().or([])
   let version = get_version(args[0], list)
@@ -54,4 +54,25 @@ fn install_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
     return
   }
   println("Node.js \{version} installed successfully.")
+}
+
+///|
+impl @mug.TCommand for InstallCmd with name(self) {
+  self.name
+}
+
+///|
+impl @mug.TCommand for InstallCmd with description(self) {
+  self.description
+}
+
+///|
+impl @mug.HelpPrinter for InstallCmd with print_usage(self) {
+  println("  \{self.name} - \{self.description}")
+}
+
+///|
+let install_cmd : InstallCmd = {
+  name: "install",
+  description: "Install a specific version of Node.js. If version is \"lts\", the latest LTS version will be installed.",
 }

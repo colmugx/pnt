@@ -1,10 +1,10 @@
 ///|
-let use_cmd : @mug.Command = @mug.Command::new(
-  "use", "Switch to a specific version of Node.js. If version is \"lts\", the latest installed LTS version will be used.",
-  use_action,
-)
+priv struct UseCmd {
+  name : String
+  description : String
+}
 
-///| 替换 Node.js 相关工具的软链接
+///|
 fn replace_node_symlinks(version : String) -> Unit {
   let tools = ["node", "npm", "npx"]
   for tool in tools {
@@ -13,7 +13,7 @@ fn replace_node_symlinks(version : String) -> Unit {
 }
 
 ///|
-fn use_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
+impl @mug.TCommand for UseCmd with execute(_, args) {
   let list = @util.fetch_list?().or([])
   let version = match args[0] {
     "lts" => {
@@ -65,4 +65,25 @@ fn use_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
     $|  export PATH="\{@util.get_bin_dir()}:$PATH"
     ,
   )
+}
+
+///|
+impl @mug.TCommand for UseCmd with name(self) {
+  self.name
+}
+
+///|
+impl @mug.TCommand for UseCmd with description(self) {
+  self.description
+}
+
+///|
+impl @mug.HelpPrinter for UseCmd with print_usage(self) {
+  println("  \{self.name} - \{self.description}")
+}
+
+///|
+let use_cmd : UseCmd = {
+  name: "use",
+  description: "Switch to a specific version of Node.js. If version is \"lts\", the latest installed LTS version will be used.",
 }

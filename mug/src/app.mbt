@@ -1,7 +1,7 @@
 ///| 
 pub(open) trait TApplication {
   execute(Self, ArrayView[String]) -> Unit
-  add_command(Self, Command) -> Unit
+  add_command(Self, &TCommand) -> Unit
   version(Self) -> String?
 }
 
@@ -13,14 +13,14 @@ pub trait AppHelpPrinter {
 
 ///| 
 pub trait CommandManager {
-  find_command(Self, String) -> Command?
+  find_command(Self, String) -> &TCommand?
 }
 
 ///| 
 pub struct App {
   name : String
   description : String
-  commands : Array[Command]
+  commands : Array[&TCommand]
   ver : String?
 }
 
@@ -59,7 +59,7 @@ pub impl TApplication for App with execute(self, args : ArrayView[String]) {
 }
 
 ///|
-pub impl TApplication for App with add_command(self, command : Command) -> Unit {
+pub impl TApplication for App with add_command(self, command : &TCommand) -> Unit {
   self.commands.push(command)
 }
 
@@ -94,13 +94,13 @@ impl CommandManager for App with find_command(self, name : String) {
   self.commands.iter().find_first(fn { cmd => cmd.name() == name })
 }
 
-///| 注册新命令的简便方法
-pub fn App::register(
-  self : App,
-  cmds : Array[(String, String, TAction)]
-) -> Unit {
-  let cmds = cmds.map(fn {
-    (name, desc, action) => Command::new(name, desc, action)
-  })
-  self.commands.append(cmds)
-}
+///|
+// pub fn App::register(
+//   self : App,
+//   cmds : Array[(String, String, TAction)]
+// ) -> Unit {
+//   let cmds = cmds.map(fn {
+//     (name, desc, action) => Command::new(name, desc, action)
+//   })
+//   self.commands.append(cmds)
+// }

@@ -1,11 +1,11 @@
 ///|
-let list_cmd : @mug.Command = @mug.Command::new(
-    "list", "List all installed Node.js versions, showing the currently active version.",
-    list_action,
-)
+priv struct ListCmd {
+  name : String
+  description : String
+}
 
 ///|
-fn list_action(_ : @mug.Command, _ : @mug.TArgs) -> Unit {
+impl @mug.TCommand for ListCmd with execute(_, _) {
   let list = @util.list_node().rev()
   list.each(fn {
     item =>
@@ -15,4 +15,25 @@ fn list_action(_ : @mug.Command, _ : @mug.TArgs) -> Unit {
         println("  \{item}")
       }
   })
+}
+
+///|
+impl @mug.TCommand for ListCmd with name(self) {
+  self.name
+}
+
+///|
+impl @mug.TCommand for ListCmd with description(self) {
+  self.description
+}
+
+///|
+impl @mug.HelpPrinter for ListCmd with print_usage(self) {
+  println("  \{self.name} - \{self.description}")
+}
+
+///|
+let list_cmd : ListCmd = {
+  name: "list",
+  description: "List all installed Node.js versions, showing the currently active version.",
 }

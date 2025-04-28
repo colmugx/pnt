@@ -6,28 +6,19 @@ package "colmugx/mug"
 pub struct App {
   name : String
   description : String
-  commands : Array[Command]
+  commands : Array[&TCommand]
   ver : String?
 }
 impl App {
   new(String, String, version~ : String? = ..) -> Self
-  register(Self, Array[(String, String, (Command, ArrayView[String]) -> Unit)]) -> Unit
 }
 impl TApplication for App
 
-pub struct Command {
+pub struct Flag {
   name : String
+  short : String?
   description : String
-  flags : Map[String, Flag]
-  s_flags : Map[String, String]
-  action : (Command, ArrayView[String]) -> Unit
 }
-impl Command {
-  new(String, String, (Self, ArrayView[String]) -> Unit) -> Self
-}
-impl TFlaggable for Command
-
-type Flag
 impl Flag {
   new(String, String, short~ : String? = ..) -> Self
 }
@@ -42,24 +33,20 @@ pub trait AppHelpPrinter {
 }
 
 pub trait CommandManager {
-  find_command(Self, String) -> Command?
+  find_command(Self, String) -> &TCommand?
 }
 
-pub trait FlagParser {
-  parse_flags(Self, ArrayView[String]) -> Map[String, String]
-}
-
-pub trait HelpPrinter {
+pub(open) trait HelpPrinter {
   print_usage(Self) -> Unit
 }
 
 pub(open) trait TApplication {
   execute(Self, ArrayView[String]) -> Unit
-  add_command(Self, Command) -> Unit
+  add_command(Self, &TCommand) -> Unit
   version(Self) -> String?
 }
 
-pub(open) trait TCommand {
+pub(open) trait TCommand : HelpPrinter {
   execute(Self, ArrayView[String]) -> Unit
   name(Self) -> String
   description(Self) -> String

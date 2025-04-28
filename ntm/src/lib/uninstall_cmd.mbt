@@ -1,10 +1,11 @@
 ///|
-let uninstall_cmd : @mug.Command = @mug.Command::new(
-  "uninstall", "Uninstall a specific version of Node.js.", uninstall_action,
-)
+priv struct UninstallCmd {
+  name : String
+  description : String
+}
 
 ///|
-fn uninstall_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
+impl @mug.TCommand for UninstallCmd with execute(_, args) {
   let version = args[0]
   if version.is_empty() {
     println("Illegal versions.")
@@ -25,4 +26,25 @@ fn uninstall_action(_ : @mug.Command, args : @mug.TArgs) -> Unit {
     return
   }
   println("Node.js \{version} uninstalled successfully")
+}
+
+///|
+impl @mug.TCommand for UninstallCmd with name(self) {
+  self.name
+}
+
+///|
+impl @mug.TCommand for UninstallCmd with description(self) {
+  self.description
+}
+
+///|
+impl @mug.HelpPrinter for UninstallCmd with print_usage(self) {
+  println("  \{self.name} - \{self.description}")
+}
+
+///|
+let uninstall_cmd : UninstallCmd = {
+  name: "uninstall",
+  description: "Uninstall a specific version of Node.js.",
 }
