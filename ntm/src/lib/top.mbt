@@ -1,6 +1,7 @@
 ///|
 pub fn execute(_ : String, args : ArrayView[String]) -> Unit {
-  @mug.App::new("ntm", "Node Tool in Moonbit", version=@util.get_version())
+  @mug.App::new("ntm", "Node Tool in Moonbit")
+  ..version(@util.get_version())
   ..add_command(list_cmd)
   ..add_command(list_remote_cmd)
   ..add_command(install_cmd)

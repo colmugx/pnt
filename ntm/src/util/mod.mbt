@@ -2,11 +2,12 @@
 type! ReadModError String
 
 ///|
-pub fn get_version() -> String? {
-  guard read_config?() is Ok(data) else { None }
+pub fn get_version() -> String {
+  let default = ""
+  guard read_config?() is Ok(data) else { default }
   match data {
-    { "version": String(ver), .. } => Some(ver)
-    _ => None
+    { "version": String(ver), .. } => ver
+    _ => default
   }
 }
 

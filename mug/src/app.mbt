@@ -21,16 +21,17 @@ pub struct App {
   name : String
   description : String
   commands : Array[&TCommand]
-  ver : String?
+  mut ver : String?
 }
 
 ///|
-pub fn App::new(
-  name : String,
-  description : String,
-  version~ : String? = None
-) -> App {
-  { name, description, commands: [], ver: version }
+pub fn App::new(name : String, description : String) -> App {
+  { name, description, commands: [], ver: None }
+}
+
+///|
+pub fn App::version(self : App, version : String) -> Unit {
+  self.ver = Some(version)
 }
 
 ///|
