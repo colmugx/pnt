@@ -1,6 +1,6 @@
 # PNT(Pico NodeJS Toolkit)
 
-[![Release Build](https://github.com/colmugx/ntm/actions/workflows/release.yml/badge.svg)](https://github.com/colmugx/ntm/actions/workflows/release.yml)
+[![Release Build](https://github.com/colmugx/pnt/actions/workflows/release.yml/badge.svg)](https://github.com/colmugx/pnt/actions/workflows/release.yml)
 
 [简体中文](README-zh.md) | [日本語](README-ja.md)
 
@@ -19,53 +19,53 @@ PNT(Pico NodeJS Toolkit) is a Node.js management tool built on Moonbit including
 
 ## Usage
 
-NTM is a command-line tool that can be used as follows:
+PNT is a command-line tool that can be used as follows:
 
 ### List Remote Modules
 
 ```bash
-ntm list_remote
+pnt list_remote
 ```
 
 To list only LTS versions:
 
 ```bash
-ntm list_remote --lts
+pnt list_remote --lts
 ```
 
 ### Install a Specific Version
 
 ```bash
-ntm install <version>
+pnt install <version>
 ```
 
 To install the latest LTS:
 
 ```bash
-ntm install lts
+pnt install lts
 ```
 
 ### Switch to a Specific Version
 
 ```bash
-ntm use <version>
+pnt use <version>
 ```
 
 To switch to the latest LTS:
 
 ```bash
-ntm use lts
+pnt use lts
 ```
 
 ## Build Guide
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/colmugx/ntm.git
+   git clone https://github.com/colmugx/pnt.git
    ```
 2. Enter the project directory:
    ```bash
-   cd ntm
+   cd pnt
    ```
 3. Install dependencies and build the project (ensure all required dependencies are installed):
    ```bash

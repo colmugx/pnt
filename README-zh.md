@@ -17,53 +17,53 @@ PNT(Pico NodeJS Toolkit) 是一个基于 Moonbit 开发的 NodeJS 工具
 
 ## 使用方法
 
-NTM 基于命令行操作，可通过以下方式使用：
+PNT 基于命令行操作，可通过以下方式使用：
 
 ### 列出远程模块
 
 ```bash
-ntm list_remote
+pnt list_remote
 ```
 
 可以只列出 `lts`
 
 ```bash
-ntm list_remote --lts
+pnt list_remote --lts
 ```
 
 ### 安装指定模块
 
 ```bash
-ntm install <version>
+pnt install <version>
 ```
 
 可以安装最新 `lts`
 
 ```bash
-ntm install lts
+pnt install lts
 ```
 
 ### 切换使用指定版本
 
 ```bash
-ntm use <version>
+pnt use <version>
 ```
 
 可以使用最新 `lts`
 
 ```bash
-ntm use lts
+pnt use lts
 ```
 
 ## 构建指南
 
 1. 克隆该仓库：
    ```bash
-   git clone https://github.com/colmugx/ntm.git
+   git clone https://github.com/colmugx/pnt.git
    ```
 2. 进入项目目录：
    ```bash
-   cd ntm
+   cd pnt
    ```
 3. 安装依赖并构建项目（请确保已安装所需依赖）：
    ```bash

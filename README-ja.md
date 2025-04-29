@@ -17,53 +17,53 @@ PNT(Pico NodeJS Toolkit) は Moonbit をベースに開発された Node.js 管�
 
 ## 使い方
 
-NTM はコマンドラインツールとして、以下のように使用できます。
+PNT はコマンドラインツールとして、以下のように使用できます。
 
 ### リモートモジュールの一覧表示
 
 ```bash
-ntm list_remote
+pnt list_remote
 ```
 
 LTS バージョンのみを表示する場合：
 
 ```bash
-ntm list_remote --lts
+pnt list_remote --lts
 ```
 
 ### 特定バージョンのインストール
 
 ```bash
-ntm install <version>
+pnt install <version>
 ```
 
 最新の LTS をインストールする場合：
 
 ```bash
-ntm install lts
+pnt install lts
 ```
 
 ### 特定バージョンへの切り替え
 
 ```bash
-ntm use <version>
+pnt use <version>
 ```
 
 最新の LTS へ切り替える場合：
 
 ```bash
-ntm use lts
+pnt use lts
 ```
 
 ## ビルドガイド
 
 1. リポジトリをクローン：
    ```bash
-   git clone https://github.com/colmugx/ntm.git
+   git clone https://github.com/colmugx/pnt.git
    ```
 2. プロジェクトディレクトリに移動：
    ```bash
-   cd ntm
+   cd pnt
    ```
 3. 依存関係をインストールし、ビルド（必要な依存関係がインストールされていることを確認してください）：
    ```bash
