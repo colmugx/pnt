@@ -26,9 +26,9 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
-      - name: Build NTM Binary
+      - name: Build pnt Binary
         run: |
-          cd ntm
+          cd pnt
           moon update
           moon build --target native
           cd ..
@@ -36,14 +36,14 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir -p dist
-          cp zig-out/bin/ntm dist/ntm
+          cp zig-out/bin/pnt dist/pnt
 
       - name: Upload artifacts
         env:
           ARCH: ${{ runner.arch }}
         uses: actions/upload-artifact@v4
         with:
-          name: ntm-macos-${{ env.ARCH }}
+          name: pnt-macos-${{ env.ARCH }}
           path: dist/*
 
   build-linux:
@@ -68,9 +68,9 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
-      - name: Build NTM Binary
+      - name: Build pnt Binary
         run: |
-          cd ntm
+          cd pnt
           moon update
           moon build --target native
           cd ..
@@ -78,14 +78,14 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir -p dist
-          cp zig-out/bin/ntm dist/ntm
+          cp zig-out/bin/pnt dist/pnt
 
       - name: Upload artifacts
         env:
           ARCH: ${{ runner.arch }}
         uses: actions/upload-artifact@v4
         with:
-          name: ntm-linux-${{ env.ARCH }}
+          name: pnt-linux-${{ env.ARCH }}
           path: dist/*
 
   build-windows:
@@ -106,9 +106,9 @@ jobs:
           irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
           echo "$env:USERPROFILE\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
 
-      - name: Build NTM Binary
+      - name: Build pnt Binary
         run: |
-          cd ntm
+          cd pnt
           moon update
           moon build --target native
           cd ..
@@ -116,14 +116,14 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir dist
-          Copy-Item zig-out\bin\ntm.exe dist\ntm.exe
+          Copy-Item zig-out\bin\pnt.exe dist\pnt.exe
 
       - name: Upload artifacts
         env:
           ARCH: ${{ runner.arch }}
         uses: actions/upload-artifact@v4
         with:
-          name: ntm-windows-${{ env.ARCH }}
+          name: pnt-windows-${{ env.ARCH }}
           path: dist/*
 
   release:
@@ -142,28 +142,28 @@ jobs:
       - name: Zip macOS artifact
         run: |
           cd artifacts
-          for d in ntm-macos-*; do
-            zip -j "${d}.zip" "$d/ntm"
+          for d in pnt-macos-*; do
+            zip -j "${d}.zip" "$d/pnt"
           done
 
       - name: Zip linux artifact
         run: |
           cd artifacts
-          for d in ntm-linux-*; do
-            zip -j "${d}.zip" "$d/ntm"
+          for d in pnt-linux-*; do
+            zip -j "${d}.zip" "$d/pnt"
           done
 
       # - name: Zip windows artifact
       #   run: |
       #     cd artifacts
-      #     for d in ntm-windows-*; do
-      #       zip -j "${d}.zip" "$d/ntm.exe"
+      #     for d in pnt-windows-*; do
+      #       zip -j "${d}.zip" "$d/pnt.exe"
       #     done
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/ntm-macos-*.zip
-            artifacts/ntm-linux-*.zip
-          # artifacts/ntm-windows-*.zip
+            artifacts/pnt-macos-*.zip
+            artifacts/pnt-linux-*.zip
+          # artifacts/pnt-windows-*.zip

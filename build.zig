@@ -76,7 +76,7 @@ pub fn build(b: *std.Build) !void {
     }
 
     const exe = b.addExecutable(.{
-        .name = "ntm",
+        .name = "pnt",
         .target = target,
         .optimize = optimize,
         .strip = true,
@@ -91,7 +91,7 @@ pub fn build(b: *std.Build) !void {
     });
 
     exe.addCSourceFile(.{
-        .file = b.path("ntm/target/native/release/build/main/main.c"),
+        .file = b.path("pnt/target/native/release/build/main/main.c"),
         .flags = &.{
             "-Wall",
             "-fwrapv",
@@ -100,9 +100,9 @@ pub fn build(b: *std.Build) !void {
     });
 
     if (target.result.os.tag == .windows) {
-        exe.addObjectFile(b.path("ntm/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.lib"));
+        exe.addObjectFile(b.path("pnt/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.lib"));
     } else {
-        exe.addObjectFile(b.path("ntm/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.a"));
+        exe.addObjectFile(b.path("pnt/target/native/release/build/.mooncakes/moonbitlang/x/sys/internal/ffi/libffi.a"));
     }
 
     exe.linkLibrary(lib);

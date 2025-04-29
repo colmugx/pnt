@@ -45,7 +45,7 @@ impl @mug.TCommand for UseCmd with execute(_, args) {
   }
   if not(@util.is_version_installed(version)) {
     println(
-      "Node.js \{version} is not installed. Install it first with 'ntm install \{version}'",
+      "Node.js \{version} is not installed. Install it first with 'pnt install \{version}'",
     )
     return
   }
@@ -61,7 +61,7 @@ impl @mug.TCommand for UseCmd with execute(_, args) {
   replace_node_symlinks(version)
   println(
     $|Now using Node.js \{version}
-    #|Add this to your shell profile to use ntm:
+    #|Add this to your shell profile to use pnt:
     $|  export PATH="\{@util.get_bin_dir()}:$PATH"
     ,
   )

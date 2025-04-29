@@ -1,4 +1,4 @@
-package "colmugx/ntm/util"
+package "colmugx/pnt/util"
 
 import(
   "moonbitlang/core/json"

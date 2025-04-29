@@ -1,6 +1,6 @@
 {
   "import": [
-    "colmugx/ntm/util/internal/ffi",
+    "colmugx/pnt/util/internal/ffi",
     "moonbitlang/x/fs",
     "moonbitlang/x/sys"
   ],

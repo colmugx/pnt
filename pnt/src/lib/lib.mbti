@@ -1,4 +1,4 @@
-package "colmugx/ntm/lib"
+package "colmugx/pnt/lib"
 
 // Values
 fn execute(String, ArrayView[String]) -> Unit

@@ -7,7 +7,7 @@ pub fn get_home() -> String {
 ///|
 pub fn get_app_dir() -> String {
   let home = get_home()
-  "\{home}/.local/share/ntm"
+  "\{home}/.local/share/pnt"
 }
 
 ///|

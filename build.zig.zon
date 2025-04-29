@@ -1,7 +1,7 @@
 .{
-    .name = .ntm,
+    .name = .pnt,
     .version = "0.0.0",
-    .fingerprint = 0xc5589e2f640760ce,
+    .fingerprint = 0x7a6424e8d4374d9,
     .minimum_zig_version = "0.14.0",
     .dependencies = .{},
     .paths = .{

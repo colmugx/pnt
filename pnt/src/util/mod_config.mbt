@@ -3,7 +3,7 @@
 ///|
 let resource : String =
   #|{
-  #|  "name": "colmugx/ntm",
+  #|  "name": "colmugx/pnt",
   #|  "version": "0.1.1",
   #|  "deps": {
   #|    "moonbitlang/x": "0.4.25",
