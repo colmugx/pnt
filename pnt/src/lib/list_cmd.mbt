@@ -9,7 +9,7 @@ impl @mug.TCommand for ListCmd with execute(_, _) {
   let list = @util.list_node().rev()
   list.each(fn {
     item =>
-      if @util.get_current_version() is Some(current) && item == current {
+      if @util.get_current_version() is Some(current) && item[:] == current {
         println("* \{item}")
       } else {
         println("  \{item}")

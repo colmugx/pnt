@@ -7,8 +7,8 @@
   "pre-build": [
     {
       "input": "../../moon.mod.json",
-      "output": "mod_config.mbt",
-      "command": ":embed -i $input -o $output"
+      "output": "g_mod_config.mbt",
+      "command": ":embed -i $input -o $output --name mod_config"
     }
   ]
 }

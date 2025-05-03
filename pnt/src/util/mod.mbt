@@ -13,7 +13,7 @@ pub fn get_version() -> String {
 
 ///|
 pub fn read_config() -> Json!ReadModError {
-  guard @json.parse?(resource) is Ok(json_data) else {
+  guard @json.parse?(mod_config) is Ok(json_data) else {
     raise ReadModError("JSON Parse Failed.")
   }
   json_data

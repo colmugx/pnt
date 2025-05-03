@@ -26,7 +26,7 @@ pub fn list_node() -> Array[String] {
 }
 
 ///|
-pub fn get_current_version() -> String? {
+pub fn get_current_version() -> @string.StringView? {
   let path = "\{get_bin_dir()}/node"
   let ori_path = @ffi.read_link(path)
   ori_path

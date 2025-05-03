@@ -1,5 +1,5 @@
 ///|
-pub fn execute(_ : String, args : ArrayView[String]) -> Unit {
+pub fn execute(args : ArrayView[String]) -> Unit {
   @mug.App::new("pnt", "Pico NodeJS Toolkit")
   ..version(@util.get_version())
   ..add_command(list_cmd)
