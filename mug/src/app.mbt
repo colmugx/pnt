@@ -26,7 +26,12 @@ pub struct App {
 
 ///|
 pub fn App::new(name : String, description : String) -> App {
-  { name, description, commands: [], ver: None }
+  let app = { name, description, commands: [], ver: None }
+  let help = HelpCommand::{ app, }
+  let version = VersionCommand::{ app, }
+  app.add_command(help)
+  app.add_command(version)
+  app
 }
 
 ///|
@@ -41,22 +46,16 @@ pub impl TApplication for App with execute(self, args : ArrayView[String]) {
     return
   }
   let cmd_name = args[0]
-  match cmd_name {
-    "--help" | "-h" => self.print_help()
-    "--version" | "-v" => self.print_version()
-    _ => {
-      guard self.find_command(cmd_name) is Some(cmd) else {
-        self.print_help()
-        return
-      }
-      let args = args[1:]
-      if args.length() != 0 && (args[0] == "--help" || args[0] == "-h") {
-        cmd.print_usage()
-        return
-      }
-      cmd.execute(args)
-    }
+  guard self.find_command(cmd_name) is Some(cmd) else {
+    self.print_help()
+    return
   }
+  let args = args[1:]
+  if args.length() != 0 && (args[0] == "--help" || args[0] == "-h") {
+    cmd.print_usage()
+    return
+  }
+  cmd.execute(args)
 }
 
 ///|
@@ -94,14 +93,3 @@ impl AppHelpPrinter for App with print_version(self) {
 impl CommandManager for App with find_command(self, name : String) {
   self.commands.iter().find_first(fn { cmd => cmd.name() == name })
 }
-
-///|
-// pub fn App::register(
-//   self : App,
-//   cmds : Array[(String, String, TAction)]
-// ) -> Unit {
-//   let cmds = cmds.map(fn {
-//     (name, desc, action) => Command::new(name, desc, action)
-//   })
-//   self.commands.append(cmds)
-// }

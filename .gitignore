@@ -5,3 +5,6 @@ target/
 .zig-cache
 zig-out
 .cursorignore
+
+# moonbit
+g_*.mbt

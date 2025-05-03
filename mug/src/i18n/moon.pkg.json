@@ -1,0 +1,15 @@
+{
+  "import": ["colmugx/reader"],
+  "pre-build": [
+    {
+      "input": "./lang/zh-cn.json",
+      "output": "g_zh_cn_lang.mbt",
+      "command": ":embed -i $input -o $output --name zh_cn_text"
+    },
+    {
+      "input": "./lang/en.json",
+      "output": "g_en_lang.mbt",
+      "command": ":embed -i $input -o $output --name en_text"
+    }
+  ]
+}
