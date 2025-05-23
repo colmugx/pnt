@@ -7,7 +7,7 @@ pub fn execute(args : ArrayView[String]) -> Unit {
   ..add_command(install_cmd)
   ..add_command(use_cmd)
   ..add_command(uninstall_cmd)
-  .execute(args)
+  ..execute(args)
 }
 
 ///|
