@@ -4,8 +4,8 @@ extern "C" fn http_get_ffi(url : Bytes) -> Bytes? = "zig_http_get"
 
 ///|
 pub fn get(url : String) -> String? {
-  guard http_get_ffi(string_encode_to_bytes(url)) is Some(res) else { None }
-  bytes_dencode_to_string(res)
+  guard http_get_ffi(url.to_c_str()) is Some(res) else { None }
+  res.from_c_str()
 }
 
 ///|
@@ -18,10 +18,7 @@ extern "C" fn download_file_ffi(
 
 ///|
 pub fn download(url : String, file : String) -> Unit? {
-  download_file_ffi(string_encode_to_bytes(url), string_encode_to_bytes(file), fn(
-    current,
-    total
-  ) {
+  download_file_ffi(url.to_c_str(), file.to_c_str(), fn(current, total) {
     print_ffi(
       "Downloading: \{sprint(current.to_double()/total.to_double(), 2)}%",
     )
@@ -37,10 +34,7 @@ extern "C" fn create_symlink_ffi(target : Bytes, symlink : Bytes) -> Unit = "zig
 
 ///|
 pub fn create_symlink(target : String, symlink : String) -> Unit {
-  create_symlink_ffi(
-    string_encode_to_bytes(target),
-    string_encode_to_bytes(symlink),
-  )
+  create_symlink_ffi(target.to_c_str(), symlink.to_c_str())
 }
 
 ///|
@@ -49,7 +43,8 @@ extern "C" fn read_link_ffi(symlink : Bytes) -> Bytes = "zig_read_link"
 
 ///|
 pub fn read_link(symlink : String) -> String {
-  bytes_dencode_to_string(read_link_ffi(string_encode_to_bytes(symlink))).or_default()
+  let str = symlink |> String::to_c_str |> read_link_ffi |> Bytes::from_c_str
+  str.or_default()
 }
 
 ///|
@@ -61,7 +56,7 @@ priv type! RemoveDirError
 
 ///|
 pub fn remove_dir(dir : String) -> Unit! {
-  if remove_dir_ffi(string_encode_to_bytes(dir)).is_empty() {
+  if remove_dir_ffi(dir.to_c_str()).is_empty() {
     raise RemoveDirError
   }
 }
@@ -71,7 +66,7 @@ extern "C" fn get_arch_ffi() -> Bytes? = "zig_get_arch"
 
 ///|
 pub fn get_arch() -> String {
-  bytes_dencode_to_string(get_arch_ffi().or_default()).or_default()
+  get_arch_ffi().or_default().from_c_str().or_default()
 }
 
 ///|
@@ -79,7 +74,7 @@ extern "C" fn get_os_ffi() -> Bytes? = "zig_get_os"
 
 ///|
 pub fn get_os() -> String {
-  bytes_dencode_to_string(get_os_ffi().or_default()).or_default()
+  get_os_ffi().or_default().from_c_str().or_default()
 }
 
 ///|

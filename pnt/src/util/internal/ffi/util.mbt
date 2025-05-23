@@ -7,15 +7,23 @@ fn sprint(num : Double, digits : Int) -> Double {
 }
 
 ///|
-fn string_encode_to_bytes(str : String) -> Bytes {
-  @encoding.encode(@encoding.UTF8, str)
+priv trait TCStrToString {
+  from_c_str(Self) -> String?
 }
 
 ///|
-fn bytes_dencode_to_string(bytes : Bytes) -> String? {
+priv trait TStringToCStr {
+  to_c_str(Self) -> Bytes
+}
+
+///|
+impl TCStrToString for Bytes with from_c_str(self) {
   let decoder = @encoding.decoder(@encoding.UTF8)
-  match decoder.decode?(bytes) {
-    Ok(str) => Some(str)
-    _ => None
-  }
+  guard decoder.decode?(self) is Ok(str) else { None }
+  Some(str)
+}
+
+///|
+impl TStringToCStr for String with to_c_str(self) {
+  @encoding.encode(@encoding.UTF8, self)
 }
