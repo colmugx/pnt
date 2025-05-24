@@ -219,7 +219,10 @@ export fn zig_http_get(url: util.moonbit_bytes_t) callconv(.C) util.moonbit_byte
 
     const url_slice = util.moonbitBytesToCStr(url) catch return null;
 
-    const response = makeRequest(allocator, .GET, url_slice, null) catch return null;
+    const response = makeRequest(allocator, .GET, url_slice, null) catch |err| {
+        util.last_error = .{ .code = @intFromError(err), .message = @errorName(err) };
+        return null;
+    };
 
     const moonbit_str = util.cStrToMoonbitBytes(response) catch return null;
 

@@ -7,23 +7,31 @@ fn sprint(num : Double, digits : Int) -> Double {
 }
 
 ///|
-priv trait TCStrToString {
-  from_c_str(Self) -> String?
+pub(open) trait FromCStr {
+  from_cstr(Self) -> String?
 }
 
 ///|
-priv trait TStringToCStr {
-  to_c_str(Self) -> Bytes
+pub(open) trait ToCStr {
+  to_cstr(Self) -> Bytes
 }
 
 ///|
-impl TCStrToString for Bytes with from_c_str(self) {
+pub impl FromCStr for Bytes with from_cstr(self) {
   let decoder = @encoding.decoder(@encoding.UTF8)
   guard decoder.decode?(self) is Ok(str) else { None }
   Some(str)
 }
 
 ///|
-impl TStringToCStr for String with to_c_str(self) {
+pub impl ToCStr for String with to_cstr(self) {
   @encoding.encode(@encoding.UTF8, self)
+}
+
+///|
+extern "C" fn get_error_message_ffi() -> Bytes = "zig_get_error_message"
+
+///|
+pub fn get_error_message() -> String {
+  return get_error_message_ffi().from_cstr().or("undefined error.")
 }
