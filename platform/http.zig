@@ -224,9 +224,7 @@ export fn zig_http_get(url: util.moonbit_bytes_t) callconv(.C) util.moonbit_byte
         return null;
     };
 
-    const moonbit_str = util.cStrToMoonbitBytes(response) catch return null;
-
-    return moonbit_str;
+    return util.cStrToMoonbitBytes(response);
 }
 
 export fn zig_download_file(url: util.moonbit_bytes_t, path: util.moonbit_bytes_t, callback: ?*const fn (u64, u64) void) callconv(.C) void {

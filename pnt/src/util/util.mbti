@@ -2,6 +2,7 @@ package "colmugx/pnt/util"
 
 import(
   "moonbitlang/core/json"
+  "moonbitlang/core/string"
 )
 
 // Values
@@ -19,13 +20,13 @@ fn get_arch() -> String
 
 fn get_bin_dir() -> String
 
-fn get_current_version() -> String?
+fn get_current_version() -> @string.StringView?
 
 fn get_home() -> String
 
 fn get_os() -> String
 
-fn get_version() -> String?
+fn get_version() -> String
 
 fn get_version_dir() -> String
 

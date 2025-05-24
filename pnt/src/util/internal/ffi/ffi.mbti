@@ -9,6 +9,8 @@ fn get(String) -> String?
 
 fn get_arch() -> String
 
+fn get_error_message() -> String
+
 fn get_os() -> String
 
 fn read_link(String) -> String
@@ -20,4 +22,13 @@ fn remove_dir(String) -> Unit!
 // Type aliases
 
 // Traits
+pub(open) trait FromCStr {
+  from_cstr(Self) -> String?
+}
+impl FromCStr for Bytes
+
+pub(open) trait ToCStr {
+  to_cstr(Self) -> Bytes
+}
+impl ToCStr for String
 

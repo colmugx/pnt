@@ -1,6 +1,7 @@
 package "colmugx/pnt/main"
 
 // Values
+fn moonbit_main() -> Unit
 
 // Types and methods
 

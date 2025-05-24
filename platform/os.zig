@@ -56,7 +56,7 @@ export fn zig_read_link(symlink: util.moonbit_bytes_t) callconv(.C) util.moonbit
     const symlink_slice = util.moonbitBytesToCStr(symlink) catch return null;
     const path = std.fs.readLinkAbsolute(symlink_slice, &buffer) catch return null;
 
-    return util.cStrToMoonbitBytes(path) catch return null;
+    return util.cStrToMoonbitBytes(path);
 }
 
 export fn zig_remove_dir(dir: util.moonbit_bytes_t) callconv(.C) void {
