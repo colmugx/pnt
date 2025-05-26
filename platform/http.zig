@@ -114,7 +114,7 @@ fn makeRequest(allocator: std.mem.Allocator, method: http.Method, url: []const u
     });
 
     if (response.status != .ok) {
-        std.log.err("HTTP request returned non-OK status: {}\n", .{response.status});
+        // std.log.err("HTTP request returned non-OK status: {}\n", .{response.status});
         return HttpError.HttpStatusNotSuccess;
     }
 
@@ -139,7 +139,7 @@ fn downloadAndExtractTarGz(
     const headers = &[_]http.Header{};
     const uri = std.Uri.parse(url) catch |err| switch (err) {
         error.UnexpectedCharacter => {
-            std.log.err("Failed to parse URL: {s}", .{url});
+            // std.log.err("Failed to parse URL: {s}", .{url});
             return HttpError.InvalidUrl;
         },
         else => return err,
@@ -190,7 +190,7 @@ fn downloadAndExtractTarGz(
     };
 
     if (req.response.status != .ok) {
-        std.log.err("HTTP download from '{s}' returned non-success status: {any}\n", .{ url, req.response.status });
+        // std.log.err("HTTP download from '{s}' returned non-success status: {any}\n", .{ url, req.response.status });
         return HttpError.HttpStatusNotSuccess;
     }
 
@@ -207,7 +207,7 @@ fn downloadAndExtractTarGz(
     var dcp = std.compress.gzip.decompressor(br.reader());
 
     std.tar.pipeToFileSystem(folder, dcp.reader(), .{ .strip_components = 1 }) catch {
-        std.log.err("Generic error during tar extraction", .{});
+        // std.log.err("Generic error during tar extraction", .{});
         return HttpError.ArchiveExtractionFailed;
     };
 }
@@ -220,7 +220,7 @@ export fn zig_http_get(url: util.moonbit_bytes_t) callconv(.C) util.moonbit_byte
     const url_slice = util.moonbitBytesToCStr(url) catch return null;
 
     const response = makeRequest(allocator, .GET, url_slice, null) catch |err| {
-        util.last_error = .{ .code = @intFromError(err), .message = @errorName(err) };
+        util.setError(err, null);
         return null;
     };
 
@@ -235,5 +235,8 @@ export fn zig_download_file(url: util.moonbit_bytes_t, path: util.moonbit_bytes_
     const url_slice = util.moonbitBytesToCStr(url) catch return;
     const path_slice = util.moonbitBytesToCStr(path) catch return;
 
-    downloadAndExtractTarGz(allocator, url_slice, path_slice, callback) catch return;
+    downloadAndExtractTarGz(allocator, url_slice, path_slice, callback) catch |err| {
+        util.setError(err, null);
+        return;
+    };
 }

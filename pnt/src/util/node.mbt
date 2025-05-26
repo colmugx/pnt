@@ -1,5 +1,5 @@
 ///|
-type! FetchError
+type! FetchListError String derive(Show)
 
 ///|
 pub struct RemoteNode {
@@ -11,11 +11,18 @@ pub struct RemoteNode {
 } derive(@json.FromJson)
 
 ///|
-pub fn fetch_list() -> Array[RemoteNode]!FetchError {
+pub fn fetch_list() -> Array[RemoteNode]!FetchListError {
   let list_url = "https://nodejs.org/dist/index.json"
-  guard @ffi.get(list_url) is Some(resp) else { raise FetchError }
-  guard @json.parse?(resp) is Ok(json) else { raise FetchError }
-  guard @json.from_json?(json) is Ok(data) else { raise FetchError }
+  let resp = try @ffi.get!(list_url) catch {
+    @ffi.NetworkError(err) => raise FetchListError(err)
+    _ => ""
+  }
+  guard @json.parse?(resp) is Ok(json) else {
+    raise FetchListError("parse json failed.")
+  }
+  guard @json.from_json?(json) is Ok(data) else {
+    raise FetchListError("convert json failed.")
+  }
   let data : Array[RemoteNode] = data
   data
 }

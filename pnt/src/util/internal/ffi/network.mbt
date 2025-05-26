@@ -1,10 +1,15 @@
 ///|
+pub type! NetworkError String
+
+///|
 #borrow(url)
 extern "C" fn http_get_ffi(url : Bytes) -> Bytes? = "zig_http_get"
 
 ///|
-pub fn get(url : String) -> String? {
-  guard http_get_ffi(url.to_cstr()) is Some(res) else { None }
+pub fn get!(url : String) -> String {
+  guard http_get_ffi(url.to_cstr()) is Some(res) else {
+    raise NetworkError(get_error_message())
+  }
   res.from_cstr()
 }
 

@@ -10,7 +10,7 @@ fn create_dir(String) -> Unit!
 
 fn download_file(String, String) -> Unit?
 
-fn fetch_list() -> Array[RemoteNode]!FetchError
+fn fetch_list() -> Array[RemoteNode]!FetchListError
 
 fn format_node_tarball(os_tag~ : String, cpu_arch~ : String, version~ : String) -> String
 
@@ -45,7 +45,8 @@ fn remove_by_version(String) -> Unit!
 fn replace_symlink(String, String) -> Unit
 
 // Types and methods
-type FetchError
+type FetchListError
+impl Show for FetchListError
 
 type ReadModError
 

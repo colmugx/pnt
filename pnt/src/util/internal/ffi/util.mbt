@@ -11,5 +11,5 @@ extern "C" fn get_error_message_ffi() -> Bytes = "zig_get_error_message"
 
 ///|
 pub fn get_error_message() -> String {
-  return get_error_message_ffi().from_cstr().or("undefined error.")
+  return get_error_message_ffi().from_cstr()
 }

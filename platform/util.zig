@@ -11,9 +11,29 @@ const MoonbitError = error{
     StrToMoonbitFailed,
 };
 
-pub fn moonbitBytesToCStr(str: moonbit.moonbit_bytes_t) MoonbitError![]const u8 {
-    if (str == 0) return MoonbitError.MoonbitToStrFailed;
+pub const CError = struct {
+    code: c_int,
+    message: ?[:0]const u8,
+};
 
+pub threadlocal var last_error: CError = .{
+    .code = 0,
+    .message = null,
+};
+
+pub fn setError(err: anyerror, message: ?[:0]const u8) void {
+    last_error = .{ .code = @intFromError(err), .message = message orelse @errorName(err) };
+}
+
+export fn zig_get_error_message() callconv(.C) moonbit.moonbit_bytes_t {
+    const message = last_error.message orelse "unknown error.";
+    const result = moonbit.moonbit_make_bytes(@intCast(message.len), 0);
+
+    @memcpy(result[0..message.len], message);
+    return result;
+}
+
+pub fn moonbitBytesToCStr(str: moonbit.moonbit_bytes_t) MoonbitError![]const u8 {
     const len = moonbit.Moonbit_array_length(str);
     if (len == 0) {
         return MoonbitError.MoonbitToStrFailed;
@@ -22,12 +42,12 @@ pub fn moonbitBytesToCStr(str: moonbit.moonbit_bytes_t) MoonbitError![]const u8 
     return str[0..len];
 }
 
-pub fn cStrToMoonbitBytes(cstr: ?[]u8) MoonbitError!moonbit.moonbit_bytes_t {
-    const str = cstr orelse return MoonbitError.StrToMoonbitFailed;
+pub fn cStrToMoonbitBytes(cstr: ?[]u8) moonbit.moonbit_bytes_t {
+    const str = cstr orelse "";
     const len = str.len;
     const result = moonbit.moonbit_make_bytes(@intCast(len), 0);
 
-    if (result == 0) return MoonbitError.StrToMoonbitFailed;
+    if (result == 0) return null;
     if (len == 0) return result;
 
     @memcpy(result[0..len], str);
@@ -52,25 +72,4 @@ export fn zig_print(str: moonbit.moonbit_string_t) callconv(.C) void {
     }
 
     std.debug.print("\r{s}\x1b[K", .{result});
-}
-
-pub const CError = struct {
-    code: c_int,
-    message: ?[:0]const u8,
-};
-
-pub threadlocal var last_error: CError = .{
-    .code = 0,
-    .message = null,
-};
-
-export fn zig_get_error_message() callconv(.C) moonbit.moonbit_bytes_t {
-    const len = last_error.message.?.len;
-    const result = moonbit.moonbit_make_bytes(@intCast(len), 0);
-
-    if (result == 0) return null;
-    if (len == 0) return result;
-
-    @memcpy(result[0..len], last_error.message.?);
-    return result;
 }

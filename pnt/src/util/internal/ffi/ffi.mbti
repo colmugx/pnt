@@ -5,7 +5,7 @@ fn create_symlink(String, String) -> Unit
 
 fn download(String, String) -> Unit?
 
-fn get(String) -> String?
+fn get(String) -> String!
 
 fn get_arch() -> String
 
@@ -18,12 +18,13 @@ fn read_link(String) -> String
 fn remove_dir(String) -> Unit!
 
 // Types and methods
+pub type! NetworkError String
 
 // Type aliases
 
 // Traits
 pub(open) trait FromCStr {
-  from_cstr(Self) -> String?
+  from_cstr(Self) -> String
 }
 impl FromCStr for Bytes
 
