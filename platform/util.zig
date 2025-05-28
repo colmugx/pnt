@@ -73,3 +73,12 @@ export fn zig_print(str: moonbit.moonbit_string_t) callconv(.C) void {
 
     std.debug.print("\r{s}\x1b[K", .{result});
 }
+
+pub fn copyReaderToWriter(reader: anytype, writer: anytype) !void {
+    var buffer: [1024]u8 = undefined;
+    while (true) {
+        const bytes_read = try reader.read(&buffer);
+        if (bytes_read == 0) break;
+        try writer.writeAll(buffer[0..bytes_read]);
+    }
+}
