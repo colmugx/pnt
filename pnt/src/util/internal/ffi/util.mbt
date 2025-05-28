@@ -7,9 +7,15 @@ fn sprint(num : Double, digits : Int) -> Double {
 }
 
 ///|
-extern "C" fn get_error_message_ffi() -> Bytes = "zig_get_error_message"
+priv type ZigError
+
+///|
+extern "C" fn ZigError::get() -> ZigError = "zig_get_error"
+
+///|
+extern "C" fn ZigError::message(self : ZigError) -> Bytes = "zig_get_error_message"
 
 ///|
 pub fn get_error_message() -> String {
-  return get_error_message_ffi().from_cstr()
+  ZigError::get().message().from_cstr()
 }

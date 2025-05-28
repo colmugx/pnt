@@ -14,31 +14,7 @@ fn replace_node_symlinks(version : String) -> Unit {
 
 ///|
 impl @mug.TCommand for UseCmd with execute(_, args) {
-  let list = @util.fetch_list?().or([])
-  let version = match args[0] {
-    "lts" => {
-      let latest_lts = list
-        .iter()
-        .find_first(fn {
-          item =>
-            match item.lts.as_string() {
-              None => false
-              Some(_) => true
-            }
-        })
-        .unwrap()
-      let version = @util.normalize_version(latest_lts.version)
-      println("Latest LTS version is \{version}")
-      version
-    }
-    "latest" => {
-      let latest_lts = list[0]
-      let version = @util.normalize_version(latest_lts.version)
-      println("Latest version is \{version}")
-      version
-    }
-    str => @util.normalize_version(str)
-  }
+  let version = get_version?(args[0]).or(String::default())
   if version.is_empty() {
     println("Error fetching available versions.")
     return

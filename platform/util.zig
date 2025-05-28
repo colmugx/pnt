@@ -25,6 +25,10 @@ pub fn setError(err: anyerror, message: ?[:0]const u8) void {
     last_error = .{ .code = @intFromError(err), .message = message orelse @errorName(err) };
 }
 
+export fn zig_get_error() *CError {
+    return &last_error;
+}
+
 export fn zig_get_error_message() callconv(.C) moonbit.moonbit_bytes_t {
     const message = last_error.message orelse "unknown error.";
     const result = moonbit.moonbit_make_bytes(@intCast(message.len), 0);

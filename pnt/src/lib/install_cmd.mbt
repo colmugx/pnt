@@ -1,12 +1,17 @@
 ///|
+priv type! VersionError
+
+///|
 priv struct InstallCmd {
   name : String
   description : String
 }
 
 ///| 获取版本号
-fn get_version(version_arg : String, list : Array[@util.RemoteNode]) -> String {
-  match version_arg {
+fn get_version!(tag : String) -> String {
+  guard tag is "lts" || tag is "latest" else { @util.normalize_version(tag) }
+  let list = @util.fetch_list!()
+  match tag {
     "lts" => {
       let latest_lts = list
         .iter()
@@ -24,15 +29,14 @@ fn get_version(version_arg : String, list : Array[@util.RemoteNode]) -> String {
       println("Latest version is \{version}")
       version
     }
-    str => @util.normalize_version(str)
+    _ => raise VersionError
   }
 }
 
 ///|
 impl @mug.TCommand for InstallCmd with execute(_, args) {
   let base_url = "https://nodejs.org/dist"
-  let list = @util.fetch_list?().or([])
-  let version = get_version(args[0], list)
+  let version = get_version?(args[0]).or(String::default())
   if version.is_empty() {
     println("Error fetching available versions.")
     return

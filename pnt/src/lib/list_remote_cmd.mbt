@@ -62,15 +62,21 @@ impl @mug.TFlaggable for ListRemoteCmd with has_flag(self, args, key) {
 
 ///|
 impl @mug.TCommand for ListRemoteCmd with execute(self, args) {
-  let list = @util.fetch_list?().or([]).rev()
-  let filtered = if self.has_flag(args, "lts") {
-    list.filter(fn {
-      item => item.lts.as_string().map_or(false, fn { s => not(s.is_empty()) })
-    })
-  } else {
-    list
+  match @util.fetch_list?() {
+    Err(err) => println(err)
+    Ok(list) => {
+      let list = list.rev()
+      let filtered = if self.has_flag(args, "lts") {
+        list.filter(fn {
+          item =>
+            item.lts.as_string().map_or(false, fn { s => not(s.is_empty()) })
+        })
+      } else {
+        list
+      }
+      filtered.each(fn { item => println(format_version(item)) })
+    }
   }
-  filtered.each(fn { item => println(format_version(item)) })
 }
 
 ///|
