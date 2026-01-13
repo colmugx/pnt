@@ -23,15 +23,16 @@ impl TCommand for TestCommand with description(self) {
 ///|
 impl TCommand for TestCommand with execute(self, args) {
   self.execute_called = true
-  self.received_args = args
+  self.received_args = Array::from_iter(args.iter())
 }
 
+///|
 impl TCommand for TestCommand with execute_async(self, args) {
   self.execute(args)
 }
 
 ///|
-impl HelpPrinter for TestCommand with print_usage(self) {
+impl TCommand for TestCommand with print_usage(_self) {
   println("  test\tA test command")
 }
 
@@ -46,7 +47,7 @@ test "App::new creates app with basic fields" {
 ///|
 test "App::version sets version" {
   let app = App::new("testapp", "A test application")
-  app.version("1.0.0")
+  let app = app.version("1.0.0")
   match app.ver {
     Some(v) => inspect(v, content="1.0.0")
     None => @test.fail("Version should be Some")
@@ -57,8 +58,7 @@ test "App::version sets version" {
 test "App::add_command adds command to list" {
   let app = App::new("testapp", "A test application")
   let cmd = TestCommand::new()
-  app.add_command(cmd)
-
+  let app = app.add_command(cmd)
   inspect(app.commands.length(), content="1")
 }
 
@@ -66,7 +66,7 @@ test "App::add_command adds command to list" {
 test "App::add_command makes command available" {
   let app = App::new("testapp", "A test application")
   let cmd = TestCommand::new()
-  app.add_command(cmd)
+  let app = app.add_command(cmd)
 
   // Check that command was added to the list
   inspect(app.commands.length(), content="1")
@@ -83,9 +83,7 @@ test "App commands array stores commands correctly" {
   let app = App::new("testapp", "A test application")
   let cmd1 = TestCommand::new()
   let cmd2 = TestCommand::new()
-  app.add_command(cmd1)
-  app.add_command(cmd2)
-
+  let app = app.add_command(cmd1).add_command(cmd2)
   inspect(app.commands.length(), content="2")
 }
 
@@ -97,7 +95,7 @@ test "App ensure_default_commands adds help and version" {
   inspect(app.commands.length(), content="0")
 
   // Call ensure_default_commands
-  app.ensure_default_commands()
+  let app = app.ensure_default_commands()
 
   // Should have help and version commands
   inspect(app.commands.length(), content="2")
@@ -115,13 +113,10 @@ test "App ensure_default_commands adds help and version" {
 ///|
 test "App ensure_default_commands is idempotent" {
   let app = App::new("testapp", "A test application")
-
-  app.ensure_default_commands()
+  let app = app.ensure_default_commands()
   let count_after_first = app.commands.length()
-
-  app.ensure_default_commands()
+  let app = app.ensure_default_commands()
   let count_after_second = app.commands.length()
-
   inspect(count_after_first.to_string(), content="2")
   inspect(count_after_second.to_string(), content="2")
 }
@@ -133,7 +128,6 @@ test "App::new initializes i18n with English translations" {
   // Test that i18n is initialized and working
   let help_text = app.i18n.t("help")
   let version_text = app.i18n.t("version")
-
   inspect(help_text, content="Show help information")
   inspect(version_text, content="Show version")
 }
@@ -157,14 +151,13 @@ test "App::with_translations adds custom translations" {
   // Add custom translations
   let custom_translations : Map[String, String] = {
     "custom.message": "Custom message",
-    "another.key": "Another value"
+    "another.key": "Another value",
   }
   let app_custom = app.with_translations("en-US", custom_translations)
 
   // Test that custom translations work
   let custom_text = app_custom.i18n.t("custom.message")
   let another_text = app_custom.i18n.t("another.key")
-
   inspect(custom_text, content="Custom message")
   inspect(another_text, content="Another value")
 }
@@ -217,4 +210,3 @@ test "VersionCommand uses i18n for description" {
   let version_text = app.i18n.t("version")
   inspect(version_text, content="Show version")
 }
-

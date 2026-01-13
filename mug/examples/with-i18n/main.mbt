@@ -3,13 +3,7 @@
 /// This example demonstrates internationalization features
 
 pub fn main {
-  // Create app with auto-detected locale
-  let app = @app.App::new("i18n-demo", "CLI with i18n support")
-
-  // Set version
-  app.version("1.0.0")
-
-  // Add custom translations
+  // Define custom translations
   let translations : Map[String, String] = {
     "greet.description": "Greet someone by name",
     "greet.hello": "Hello",
@@ -20,18 +14,20 @@ pub fn main {
     "errors.no_name": "Error: Please provide a name"
   }
 
-  let app_with_i18n = app.with_translations("en-US", translations)
+  // Build app with i18n support
+  let configured_app = @app.App::new("i18n-demo", "CLI with i18n support")
+    .version("1.0.0")
+    .with_translations("en-US", translations)
 
-  // Add commands that use i18n
-  let greet = GreetCommand::{ app: app_with_i18n }
-  app_with_i18n.add_command(greet)
+  // Create commands that use the configured app's i18n
+  let greet_cmd = GreetCommand::{ app: configured_app }
+  let farewell_cmd = FarewellCommand::{ app: configured_app }
 
-  let farewell = FarewellCommand::{ app: app_with_i18n }
-  app_with_i18n.add_command(farewell)
-
-  // Execute
-  let args = @sys.argv.get_view()
-  app_with_i18n.execute(args)
+  // Add commands and execute
+  configured_app
+    .add_command(greet_cmd)
+    .add_command(farewell_cmd)
+    .execute(@sys.argv.get_view())
 }
 
 ///|
@@ -65,7 +61,11 @@ impl TCommand for GreetCommand with execute(self, args) {
   println(welcome)
 }
 
-impl HelpPrinter for GreetCommand with print_usage(self) {
+impl TCommand for GreetCommand with execute_async(self, args) {
+  self.execute(args)
+}
+
+impl TCommand for GreetCommand with print_usage(self) {
   println("  \{self.name()} - \{self.description()}")
   println("    Usage: i18n-demo greet <name>")
 }
@@ -101,7 +101,11 @@ impl TCommand for FarewellCommand with execute(self, args) {
   println(seeya)
 }
 
-impl HelpPrinter for FarewellCommand with print_usage(self) {
+impl TCommand for FarewellCommand with execute_async(self, args) {
+  self.execute(args)
+}
+
+impl TCommand for FarewellCommand with print_usage(self) {
   println("  \{self.name()} - \{self.description()}")
   println("    Usage: i18n-demo farewell <name>")
 }

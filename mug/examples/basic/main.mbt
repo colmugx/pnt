@@ -3,22 +3,16 @@
 /// This example demonstrates a simple CLI with custom commands
 
 pub fn main {
-  // Create a new CLI application
-  let app = @app.App::new("basic", "A basic CLI example")
+  // Create commands
+  let greet_cmd = GreetCommand::{}
+  let calc_cmd = CalcCommand::{}
 
-  // Set version
-  app.version("1.0.0")
-
-  // Add custom commands
-  let greet = GreetCommand::{}
-  app.add_command(greet)
-
-  let calc = CalcCommand::{}
-  app.add_command(calc)
-
-  // Execute the application with command-line arguments
-  let args = @sys.argv.get_view()
-  app.execute(args)
+  // Build app with method chaining - cleaner and more readable
+  @app.App::new("basic", "A basic CLI example")
+    .version("1.0.0")
+    .add_command(greet_cmd)
+    .add_command(calc_cmd)
+    .execute(@sys.argv.get_view())
 }
 
 ///|
@@ -41,7 +35,11 @@ impl TCommand for GreetCommand with execute(self, args) {
   }
 }
 
-impl HelpPrinter for GreetCommand with print_usage(self) {
+impl TCommand for GreetCommand with execute_async(self, args) {
+  self.execute(args)
+}
+
+impl TCommand for GreetCommand with print_usage(self) {
   println("  \{self.name()} - \{self.description()}")
   println("    Usage: basic greet [name]")
 }
@@ -90,7 +88,11 @@ impl TCommand for CalcCommand with execute(self, args) {
   println("Result: \{result}")
 }
 
-impl HelpPrinter for CalcCommand with print_usage(self) {
+impl TCommand for CalcCommand with execute_async(self, args) {
+  self.execute(args)
+}
+
+impl TCommand for CalcCommand with print_usage(self) {
   println("  \{self.name()} - \{self.description()}")
   println("    Usage: basic calc <num1> <operator> <num2>")
   println("    Operators: +, -, *, /")

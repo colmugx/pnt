@@ -1,12 +1,18 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "colmugx/mug"
 
+import(
+  "colmugx/mug/i18n"
+)
+
 // Values
 pub fn clear_line() -> Unit
 
 pub fn hide_cursor() -> Unit
 
 pub fn move_up(Int) -> Unit
+
+pub fn parse_args(Array[String], Map[String, Flag]) -> Result[ParsedArgs, ParseError]
 
 pub fn show_cursor() -> Unit
 
@@ -17,20 +23,95 @@ pub struct App {
   name : String
   description : String
   commands : Array[&TCommand]
-  mut ver : String?
+  ver : String?
+  default_commands_added : Bool
+  i18n : @i18n.I18n
 }
+pub fn App::disable_i18n(Self) -> Self
+pub fn App::enable_i18n(Self) -> Self
+pub fn App::ensure_default_commands(Self) -> Self
 pub fn App::new(String, String) -> Self
-pub fn App::version(Self, String) -> Unit
+pub fn App::version(Self, String) -> Self
+pub fn App::with_locale(Self, String) -> Self
+pub fn App::with_translations(Self, String, Map[String, String]) -> Self
 pub impl TApplication for App
 
 pub struct Flag {
   name : String
   short : String?
   description : String
+  flag_type : FlagType
+  required : Bool
+  default_value : String?
 }
-pub fn Flag::new(String, String, short? : String?) -> Self
+pub fn Flag::get_short(Self) -> String?
+pub fn Flag::get_type(Self) -> FlagType
+pub fn Flag::new(String, String, short? : String?, flag_type? : FlagType, required? : Bool) -> Self
 
-pub struct Spinner {
+pub(all) enum FlagError {
+  NotFound(String)
+  WrongType(String)
+  UnexpectedBoolean(String)
+}
+pub impl Eq for FlagError
+pub impl Show for FlagError
+pub impl ToJson for FlagError
+
+pub enum FlagType {
+  Boolean
+  StringVal
+  Int
+  Multiple
+}
+pub impl Eq for FlagType
+pub impl Show for FlagType
+pub impl ToJson for FlagType
+
+pub enum FlagValue {
+  Boolean(Bool)
+  StringVal(String)
+  Int(Int)
+  Multiple(Array[String])
+}
+pub impl Eq for FlagValue
+pub impl Show for FlagValue
+pub impl ToJson for FlagValue
+
+pub struct FlaggableCommand {
+  name : String
+  description : String
+  flags : Array[Flag]
+  execute_fn : (ArrayView[String]) -> Unit
+}
+pub fn FlaggableCommand::add_flag_def(Self, Flag) -> Self
+pub fn FlaggableCommand::new(String, String) -> Self
+pub fn FlaggableCommand::with_executor(Self, (ArrayView[String]) -> Unit) -> Self
+
+pub(all) struct HelpCommand {
+  app : App
+}
+
+pub enum ParseError {
+  UnknownFlag(String)
+  MissingValue(String)
+  InvalidInt(String, String)
+  UnexpectedValue(String, String)
+}
+pub impl Eq for ParseError
+pub impl Show for ParseError
+
+pub struct ParsedArgs {
+  positional : Array[String]
+  flags : Map[String, FlagValue]
+}
+pub fn ParsedArgs::get_bool(Self, String) -> Bool
+pub fn ParsedArgs::get_int(Self, String) -> Result[Int, String]
+pub fn ParsedArgs::get_multiple(Self, String) -> Array[String]
+pub fn ParsedArgs::get_positional(Self) -> Array[String]
+pub fn ParsedArgs::get_string(Self, String) -> Result[String, String]
+pub fn ParsedArgs::has_flag(Self, String) -> Bool
+
+pub(all) struct Spinner {
   frames : Array[String]
   msg : String
   mut idx : Int
@@ -38,6 +119,10 @@ pub struct Spinner {
 pub fn Spinner::finish(Self, String) -> Unit
 pub fn Spinner::new(String) -> Self
 pub fn Spinner::tick(Self) -> Unit
+
+pub(all) struct VersionCommand {
+  app : App
+}
 
 // Type aliases
 pub type TArgs = ArrayView[String]
@@ -48,28 +133,29 @@ pub trait AppHelpPrinter {
   print_version(Self) -> Unit
 }
 
-pub trait CommandManager {
+pub(open) trait CommandManager {
   find_command(Self, String) -> &TCommand?
 }
 
-pub(open) trait HelpPrinter {
-  print_usage(Self) -> Unit
-}
-
 pub(open) trait TApplication {
-  async execute(Self, ArrayView[String]) -> Unit
-  add_command(Self, &TCommand) -> Unit
+  execute(Self, ArrayView[String]) -> Unit
+  async execute_async(Self, ArrayView[String]) -> Unit
+  add_command(Self, &TCommand) -> Self
   version(Self) -> String?
 }
 
-pub(open) trait TCommand : HelpPrinter {
-  async execute(Self, Array[String]) -> Unit
+pub(open) trait TCommand {
+  execute(Self, ArrayView[String]) -> Unit
+  async execute_async(Self, ArrayView[String]) -> Unit
   name(Self) -> String
   description(Self) -> String
+  print_usage(Self) -> Unit
 }
 
 pub(open) trait TFlaggable {
-  has_flag(Self, Array[String], String) -> Bool
-  add_flag(Self, Flag) -> Unit
+  get_flag_string(Self, Array[String], String) -> Result[String, FlagError]
+  get_flag_int(Self, Array[String], String) -> Result[Int, FlagError]
+  get_flag_multiple(Self, Array[String], String) -> Array[String]
+  print_flag_help(Self) -> Unit
 }
 

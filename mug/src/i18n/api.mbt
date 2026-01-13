@@ -13,10 +13,7 @@ pub fn I18n::new() -> Result[I18n, I18NError] {
   let locale = detect_locale()
   try {
     let translations = load_catalog()
-    let config = {
-      current_locale: locale,
-      all_translations: translations
-    }
+    let config = { current_locale: locale, all_translations: translations }
     Ok({ config, enabled: true })
   } catch {
     e => Err(e)
@@ -28,10 +25,7 @@ pub fn I18n::new() -> Result[I18n, I18NError] {
 pub fn I18n::with_locale(locale : String) -> Result[I18n, I18NError] {
   try {
     let translations = load_catalog()
-    let config = {
-      current_locale: locale,
-      all_translations: translations
-    }
+    let config = { current_locale: locale, all_translations: translations }
     Ok({ config, enabled: true })
   } catch {
     e => Err(e)
@@ -43,13 +37,10 @@ pub fn I18n::with_locale(locale : String) -> Result[I18n, I18NError] {
 /// Useful for applications to provide their own translations
 pub fn I18n::with_translations(
   locale : String,
-  translations : Map[String, String]
+  translations : Map[String, String],
 ) -> I18n {
   let all_translations = Map::from_array([(locale, translations)])
-  let config = {
-    current_locale: locale,
-    all_translations: all_translations
-  }
+  let config = { current_locale: locale, all_translations }
   { config, enabled: true }
 }
 
@@ -83,7 +74,7 @@ pub fn I18n::t(self : I18n, key : String) -> String {
 pub fn I18n::add_translations(
   self : I18n,
   locale : String,
-  new_translations : Map[String, String]
+  new_translations : Map[String, String],
 ) -> I18n {
   let all_translations = self.config.all_translations
   let updated_translations = match all_translations.get(locale) {
@@ -111,10 +102,9 @@ pub fn I18n::add_translations(
       all_translations
     }
   }
-
   let new_config = {
     current_locale: self.config.current_locale,
-    all_translations: updated_translations
+    all_translations: updated_translations,
   }
   { config: new_config, enabled: self.enabled }
 }
@@ -130,14 +120,17 @@ pub fn I18n::get_locale(self : I18n) -> String {
 pub fn I18n::set_locale(self : I18n, locale : String) -> I18n {
   let new_config = {
     current_locale: locale,
-    all_translations: self.config.all_translations
+    all_translations: self.config.all_translations,
   }
   { config: new_config, enabled: self.enabled }
 }
 
 ///|
 /// Merge two maps
-fn merge_maps(base : Map[String, String], override_map : Map[String, String]) -> Map[String, String] {
+fn merge_maps(
+  base : Map[String, String],
+  override_map : Map[String, String],
+) -> Map[String, String] {
   let result = base
   let keys = override_map.keys().to_array()
   let mut i = 0
@@ -161,9 +154,8 @@ fn get_english_fallback(key : String) -> String {
     "error.missing_value": "Missing value for flag",
     "app.usage": "Usage",
     "app.available_commands": "Available commands",
-    "app.options": "Options"
+    "app.options": "Options",
   }
-
   match english_translations.get(key) {
     Some(translation) => translation
     None => key

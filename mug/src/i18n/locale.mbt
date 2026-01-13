@@ -88,7 +88,7 @@ fn map_to_full_locale(lang : String) -> String {
     "fr" => "fr-FR"
     "de" => "de-DE"
     "es" => "es-ES"
-    _ => "\{lang}-\{lang}"  // Fallback: en -> en-en
+    _ => "\{lang}-\{lang}" // Fallback: en -> en-en
   }
 }
 
@@ -98,7 +98,6 @@ fn split_char(s : String, c : Char) -> Array[String] {
   let result : Array[String] = []
   let mut current = ""
   let mut i = 0
-
   while i < s.length() {
     let char_code = s[i]
     if char_code.to_int() == c.to_int() {
@@ -111,20 +110,13 @@ fn split_char(s : String, c : Char) -> Array[String] {
     }
     i = i + 1
   }
-
   if current != "" {
     result.push(current)
   }
-
   result
 }
 
 ///|
-/// Get environment variable (placeholder for now)
-/// TODO: Implement actual environment variable access via FFI
 fn get_env(name : String) -> String? {
-  // For now, return None
-  // In the future, this should use FFI to read environment variables
-  // TODO: Add FFI binding to getenv()
-  None
+  @sys.get_env_var(name)
 }

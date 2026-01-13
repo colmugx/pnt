@@ -2,12 +2,26 @@
 package "colmugx/mug/i18n"
 
 // Values
+pub fn detect_locale() -> String
+
 pub fn load_catalog() -> Map[String, Map[String, String]] raise I18NError
 
 // Errors
 type I18NError
 
 // Types and methods
+pub struct I18n {
+  // private fields
+}
+pub fn I18n::add_translations(Self, String, Map[String, String]) -> Self
+pub fn I18n::disable(Self) -> Self
+pub fn I18n::enable(Self) -> Self
+pub fn I18n::get_locale(Self) -> String
+pub fn I18n::new() -> Result[Self, I18NError]
+pub fn I18n::set_locale(Self, String) -> Self
+pub fn I18n::t(Self, String) -> String
+pub fn I18n::with_locale(String) -> Result[Self, I18NError]
+pub fn I18n::with_translations(String, Map[String, String]) -> Self
 
 // Type aliases
 

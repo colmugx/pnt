@@ -1,11 +1,12 @@
 ///|
 pub(open) trait TApplication {
   execute(Self, ArrayView[String]) -> Unit
-  add_command(Self, &TCommand) -> Unit
+  async execute_async(Self, ArrayView[String]) -> Unit
+  add_command(Self, &TCommand) -> Self
   version(Self) -> String?
 }
 
-///| 
+///|
 pub trait AppHelpPrinter {
   print_help(Self) -> Unit
   print_version(Self) -> Unit
@@ -21,9 +22,9 @@ pub struct App {
   name : String
   description : String
   commands : Array[&TCommand]
-  mut ver : String?
-  mut default_commands_added : Bool
-  mut i18n : @i18n.I18n
+  ver : String?
+  default_commands_added : Bool
+  i18n : @i18n.I18n
 }
 
 ///|
@@ -37,80 +38,114 @@ pub fn App::new(name : String, description : String) -> App {
     "error.missing_value": "Missing value for flag",
     "app.usage": "Usage",
     "app.available_commands": "Available commands",
-    "app.options": "Options"
+    "app.options": "Options",
   }
   let i18n = @i18n.I18n::with_translations("en-US", basic_translations)
-  { name, description, commands: [], ver: None, default_commands_added: false, i18n }
+  {
+    name,
+    description,
+    commands: [],
+    ver: None,
+    default_commands_added: false,
+    i18n,
+  }
 }
 
 ///|
 pub fn App::with_locale(self : App, locale : String) -> App {
-  self.i18n = @i18n.I18n::with_locale(locale).unwrap_or(self.i18n)
-  self
+  let new_i18n = @i18n.I18n::with_locale(locale).unwrap_or(self.i18n)
+  { ..self, i18n: new_i18n }
 }
 
 ///|
 pub fn App::with_translations(
   self : App,
   locale : String,
-  translations : Map[String, String]
+  translations : Map[String, String],
 ) -> App {
-  self.i18n = @i18n.I18n::with_translations(locale, translations)
-  self
+  let new_i18n = @i18n.I18n::with_translations(locale, translations)
+  { ..self, i18n: new_i18n }
 }
 
 ///|
 pub fn App::disable_i18n(self : App) -> App {
-  self.i18n = self.i18n.disable()
-  self
+  { ..self, i18n: self.i18n.disable() }
 }
 
 ///|
 pub fn App::enable_i18n(self : App) -> App {
-  self.i18n = self.i18n.enable()
-  self
+  { ..self, i18n: self.i18n.enable() }
 }
 
 ///|
-pub fn App::ensure_default_commands(self : App) -> Unit {
-  if self.default_commands_added { return }
-  self.default_commands_added = true
+pub fn App::ensure_default_commands(self : App) -> App {
+  if self.default_commands_added {
+    return self
+  }
   let help = HelpCommand::{ app: self }
   let version = VersionCommand::{ app: self }
-  self.add_command(help)
-  self.add_command(version)
+  let new_commands : Array[&TCommand] = []
+  for cmd in self.commands {
+    new_commands.push(cmd)
+  }
+  new_commands.push(help)
+  new_commands.push(version)
+  { ..self, commands: new_commands, default_commands_added: true }
 }
 
 ///|
-pub fn App::version(self : App, version : String) -> Unit {
-  self.ver = Some(version)
+pub fn App::version(self : App, version : String) -> App {
+  { ..self, ver: Some(version) }
 }
 
 ///|
 pub impl TApplication for App with execute(self, args : ArrayView[String]) {
-  self.ensure_default_commands()
+  let app = self.ensure_default_commands()
   if args.length() == 0 {
-    self.print_help()
+    app.print_help()
     return
   }
   let cmd_name = args[0]
-  guard self.find_command(cmd_name) is Some(cmd) else {
-    self.print_help()
+  guard app.find_command(cmd_name) is Some(cmd) else {
+    app.print_help()
     return
   }
-  let args = args[1:]
-  if args.length() != 0 && (args[0] == "--help" || args[0] == "-h") {
+  let cmd_args = args[1:]
+  if cmd_args.length() != 0 && (cmd_args[0] == "--help" || cmd_args[0] == "-h") {
     cmd.print_usage()
     return
   }
-  // Convert ArrayView to Array for TCommand.execute
-  let args_array = Array::from_iter(args.iter())
-  cmd.execute(args_array)
+  cmd.execute(cmd_args)
 }
 
 ///|
-pub impl TApplication for App with add_command(self, command : &TCommand) -> Unit {
-  self.commands.push(command)
+pub impl TApplication for App with execute_async(self, args : ArrayView[String]) {
+  let app = self.ensure_default_commands()
+  if args.length() == 0 {
+    app.print_help()
+    return
+  }
+  let cmd_name = args[0]
+  guard app.find_command(cmd_name) is Some(cmd) else {
+    app.print_help()
+    return
+  }
+  let cmd_args = args[1:]
+  if cmd_args.length() != 0 && (cmd_args[0] == "--help" || cmd_args[0] == "-h") {
+    cmd.print_usage()
+    return
+  }
+  cmd.execute_async(cmd_args)
+}
+
+///|
+pub impl TApplication for App with add_command(self, command : &TCommand) -> App {
+  let new_commands : Array[&TCommand] = []
+  for cmd in self.commands {
+    new_commands.push(cmd)
+  }
+  new_commands.push(command)
+  { ..self, commands: new_commands }
 }
 
 ///|

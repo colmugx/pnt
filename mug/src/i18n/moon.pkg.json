@@ -1,5 +1,5 @@
 {
-  "import": ["colmugx/reader"],
+  "import": ["colmugx/reader", "moonbitlang/x/sys"],
   "pre-build": [
     {
       "input": "./lang/zh-cn.json",
