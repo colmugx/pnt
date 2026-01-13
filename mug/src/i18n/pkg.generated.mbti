@@ -1,0 +1,15 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "colmugx/mug/i18n"
+
+// Values
+pub fn load_catalog() -> Map[String, Map[String, String]] raise I18NError
+
+// Errors
+type I18NError
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

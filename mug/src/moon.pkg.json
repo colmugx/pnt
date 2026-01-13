@@ -1,1 +1,4 @@
-{}
+{
+  "native-stub": ["stub.c"],
+  "import": ["colmugx/mug/i18n"]
+}

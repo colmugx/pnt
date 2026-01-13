@@ -1,11 +1,11 @@
 ///|
-typealias Locale = String
+type Locale = String
 
 ///|
-typealias TranslationKey = String
+type TranslationKey = String
 
 ///|
-typealias TranslationValue = String
+type TranslationValue = String
 
 ///|
-typealias Translations = Map[TranslationKey, TranslationValue]
+type Translations = Map[TranslationKey, TranslationValue]

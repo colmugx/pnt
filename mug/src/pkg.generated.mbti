@@ -1,0 +1,75 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "colmugx/mug"
+
+// Values
+pub fn clear_line() -> Unit
+
+pub fn hide_cursor() -> Unit
+
+pub fn move_up(Int) -> Unit
+
+pub fn show_cursor() -> Unit
+
+// Errors
+
+// Types and methods
+pub struct App {
+  name : String
+  description : String
+  commands : Array[&TCommand]
+  mut ver : String?
+}
+pub fn App::new(String, String) -> Self
+pub fn App::version(Self, String) -> Unit
+pub impl TApplication for App
+
+pub struct Flag {
+  name : String
+  short : String?
+  description : String
+}
+pub fn Flag::new(String, String, short? : String?) -> Self
+
+pub struct Spinner {
+  frames : Array[String]
+  msg : String
+  mut idx : Int
+}
+pub fn Spinner::finish(Self, String) -> Unit
+pub fn Spinner::new(String) -> Self
+pub fn Spinner::tick(Self) -> Unit
+
+// Type aliases
+pub type TArgs = ArrayView[String]
+
+// Traits
+pub trait AppHelpPrinter {
+  print_help(Self) -> Unit
+  print_version(Self) -> Unit
+}
+
+pub trait CommandManager {
+  find_command(Self, String) -> &TCommand?
+}
+
+pub(open) trait HelpPrinter {
+  print_usage(Self) -> Unit
+}
+
+pub(open) trait TApplication {
+  async execute(Self, ArrayView[String]) -> Unit
+  add_command(Self, &TCommand) -> Unit
+  version(Self) -> String?
+}
+
+pub(open) trait TCommand : HelpPrinter {
+  async execute(Self, Array[String]) -> Unit
+  name(Self) -> String
+  description(Self) -> String
+}
+
+pub(open) trait TFlaggable {
+  has_flag(Self, Array[String], String) -> Bool
+  add_flag(Self, Flag) -> Unit
+}
+

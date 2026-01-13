@@ -1,5 +1,5 @@
-///| 内置命令: version 
-priv struct VersionCommand {
+///| 内置命令: version
+pub(all) struct VersionCommand {
   app : App
 }
 
@@ -9,13 +9,17 @@ impl TCommand for VersionCommand with name(_) {
 }
 
 ///|
-impl TCommand for VersionCommand with description(_) {
-  "Show version"
+impl TCommand for VersionCommand with description(self) {
+  self.app.i18n.t("version")
 }
 
 ///|
 impl TCommand for VersionCommand with execute(self, _) {
   self.app.print_version()
+}
+
+impl TCommand for VersionCommand with execute_async(self, args) {
+  self.execute(args)
 }
 
 ///|

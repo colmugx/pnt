@@ -1,11 +1,13 @@
 ///|
-typealias Reader[Env, X] = @reader.Reader[Env, X]
+type Reader[Env, X] = @reader.Reader[Env, X]
 
 ///|
-fnalias @reader.asks
+using @reader {asks}
 
 ///|
-type! I18NError String
+suberror I18NError {
+  I18NError(String)
+}
 
 ///|
 priv struct I18nConfig {
@@ -14,19 +16,21 @@ priv struct I18nConfig {
 }
 
 ///|
-pub fn load_catalog() -> Map[Locale, Translations]!I18NError {
-  guard @json.parse?(zh_cn_text) is Ok(zh_cn_json) else { raise I18NError("") }
-  guard @json.parse?(en_text) is Ok(en_json) else { raise I18NError("") }
-  guard @json.from_json?(zh_cn_json) is Ok(zh_cn_data) else {
-    raise I18NError("")
+pub fn load_catalog() -> Map[Locale, Translations] raise I18NError {
+  try {
+    let zh_cn_json = @json.parse(zh_cn_text)
+    let zh_cn_data : Translations = @json.from_json(zh_cn_json)
+    let en_json = @json.parse(en_text)
+    let en_data : Translations = @json.from_json(en_json)
+    { "zh-CN": zh_cn_data, "en-US": en_data }
+  } catch {
+    _ => raise I18NError("Failed to load catalog")
   }
-  guard @json.from_json?(en_json) is Ok(en_data) else { raise I18NError("") }
-  { "zh-CN": zh_cn_data, "en-US": en_data }
 }
 
 ///|
 fn get_locale() -> Reader[I18nConfig, Locale] {
-  asks(fn { cfg => cfg.current_locale })
+  asks(fn(cfg) { cfg.current_locale })
 }
 
 ///|
@@ -44,9 +48,9 @@ fn translate(key : TranslationKey) -> Reader[I18nConfig, TranslationValue?] {
 
 ///|
 fn translate_or_key(
-  key : TranslationKey
+  key : TranslationKey,
 ) -> Reader[I18nConfig, TranslationValue] {
-  translate(key).map(fn { value => value.or(key) })
+  translate(key).map(fn(value) { value.unwrap_or(key) })
 }
 
 ///|
@@ -56,7 +60,7 @@ test "translate_or_key/empty_key" {
     all_translations: { "en-US": {}, "zh-CN": {} },
   }
   let reader = translate_or_key("")
-  inspect!(reader.run(config), content="")
+  inspect(reader.run(config), content="")
 }
 
 ///|
@@ -69,37 +73,46 @@ test "translate_or_key/special_characters_key" {
     },
   }
   let reader = translate_or_key("special.characters!@#$%")
-  inspect!(reader.run(config), content="Special Translation")
+  inspect(reader.run(config), content="Special Translation")
 }
 
 ///|
 test "i18n functionality using Reader Monad" {
-  let all_translations = load_catalog!()
+  let all_translations = load_catalog()
   let config_en : I18nConfig = { current_locale: "en-US", all_translations }
   let config_zh : I18nConfig = { current_locale: "zh-CN", all_translations }
 
   // 测试 get_locale
   let locale_reader = get_locale()
-  assert_eq!(locale_reader.run(config_en), "en-US")
-  assert_eq!(locale_reader.run(config_zh), "zh-CN")
+  assert_eq(locale_reader.run(config_en), "en-US")
+  assert_eq(locale_reader.run(config_zh), "zh-CN")
 
   // 测试 translate
   let version_opt_reader = translate("version")
   let missing_opt_reader = translate("nonexistent.key")
-  assert_eq!(version_opt_reader.run(config_en), Some("Show version"))
-  assert_eq!(version_opt_reader.run(config_zh), Some("显示版本信息"))
-  assert_eq!(missing_opt_reader.run(config_en), None)
-  assert_eq!(missing_opt_reader.run(config_zh), None)
+  assert_eq(version_opt_reader.run(config_en), Some("Show version"))
+  assert_eq(version_opt_reader.run(config_zh), Some("显示版本信息"))
+  assert_eq(missing_opt_reader.run(config_en), None)
+  assert_eq(missing_opt_reader.run(config_zh), None)
 
   // 测试 translate_or_key
   let help_reader = translate_or_key("help")
   let help_en = help_reader.run(config_en)
   let help_zh = help_reader.run(config_zh)
-  assert_eq!(help_en, "Show help information")
-  assert_eq!(help_zh, "显示帮助信息")
+  assert_eq(help_en, "Show help information")
+  assert_eq(help_zh, "显示帮助信息")
   let missing_key_reader = translate_or_key("nonexistent.key")
   let missing_en = missing_key_reader.run(config_en)
   let missing_zh = missing_key_reader.run(config_zh)
-  assert_eq!(missing_en, "nonexistent.key")
-  assert_eq!(missing_zh, "nonexistent.key")
+  assert_eq(missing_en, "nonexistent.key")
+  assert_eq(missing_zh, "nonexistent.key")
 }
+
+///|
+// === Public API Re-exports ===
+// The i18n public API is provided through api.mbt
+// Users can access it via @i18n.I18n when importing the mug package
+//
+// Example usage:
+//   let i18n = @i18n.I18n::new()
+//   let text = i18n.unwrap().t("help")
