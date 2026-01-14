@@ -5,11 +5,11 @@ priv struct ListCmd {
 }
 
 ///|
-impl @mug.TCommand for ListCmd with execute(_, _) {
+impl @mug_cli.TCommand for ListCmd with execute(_, _) {
   let list = @util.list_node().rev()
   list.each(fn(item) {
     if @util.get_current_version() is Some(current) && item[:] == current {
-      println("* \{item}")
+      println(@mug_ansi.green("* \{item}"))
     } else {
       println("  \{item}")
     }
@@ -17,22 +17,22 @@ impl @mug.TCommand for ListCmd with execute(_, _) {
 }
 
 ///|
-impl @mug.TCommand for ListCmd with execute_async(self, args) {
+impl @mug_cli.TCommand for ListCmd with execute_async(self, args) {
   self.execute(args)
 }
 
 ///|
-impl @mug.TCommand for ListCmd with name(self) {
+impl @mug_cli.TCommand for ListCmd with name(self) {
   self.name
 }
 
 ///|
-impl @mug.TCommand for ListCmd with description(self) {
+impl @mug_cli.TCommand for ListCmd with description(self) {
   self.description
 }
 
 ///|
-impl @mug.TCommand for ListCmd with print_usage(self) {
+impl @mug_cli.TCommand for ListCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
 }
 

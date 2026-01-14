@@ -82,12 +82,12 @@ test "i18n functionality using Reader Monad" {
   let config_en : I18nConfig = { current_locale: "en-US", all_translations }
   let config_zh : I18nConfig = { current_locale: "zh-CN", all_translations }
 
-  // 测试 get_locale
+  // test get_locale
   let locale_reader = get_locale()
   assert_eq(locale_reader.run(config_en), "en-US")
   assert_eq(locale_reader.run(config_zh), "zh-CN")
 
-  // 测试 translate
+  // test translate
   let version_opt_reader = translate("version")
   let missing_opt_reader = translate("nonexistent.key")
   assert_eq(version_opt_reader.run(config_en), Some("Show version"))
@@ -95,7 +95,7 @@ test "i18n functionality using Reader Monad" {
   assert_eq(missing_opt_reader.run(config_en), None)
   assert_eq(missing_opt_reader.run(config_zh), None)
 
-  // 测试 translate_or_key
+  // test translate_or_key
   let help_reader = translate_or_key("help")
   let help_en = help_reader.run(config_en)
   let help_zh = help_reader.run(config_zh)
@@ -107,12 +107,3 @@ test "i18n functionality using Reader Monad" {
   assert_eq(missing_en, "nonexistent.key")
   assert_eq(missing_zh, "nonexistent.key")
 }
-
-///|
-// === Public API Re-exports ===
-// The i18n public API is provided through api.mbt
-// Users can access it via @i18n.I18n when importing the mug package
-//
-// Example usage:
-//   let i18n = @i18n.I18n::new()
-//   let text = i18n.unwrap().t("help")

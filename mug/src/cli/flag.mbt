@@ -8,7 +8,6 @@ pub enum FlagType {
 } derive(Show, Eq, ToJson)
 
 ///|
-/// 选项或标志
 pub struct Flag {
   name : String
   short : String?

@@ -38,22 +38,21 @@ async fn install_get_version(tag : String) -> String {
 }
 
 ///|
-impl @mug.TCommand for InstallCmd with execute(_, args) {
-  // Synchronous version - cannot call async functions
+impl @mug_cli.TCommand for InstallCmd with execute(_, args) {
   ignore(args)
   println("Error: install command requires async context")
 }
 
 ///|
-impl @mug.TCommand for InstallCmd with execute_async(_, args) {
+impl @mug_cli.TCommand for InstallCmd with execute_async(_, args) {
   let base_url = "https://nodejs.org/dist"
   let version = install_get_version(args[0])
   if version.is_empty() {
-    println("Error fetching available versions.")
+    println(@mug_ansi.red("Error fetching available versions."))
     return
   }
   if @util.is_version_installed(version) {
-    println("Node.js \{version} is already installed.")
+    println(@mug_ansi.yellow("Node.js \{version} is already installed."))
     return
   }
   let tarball_name = @util.format_node_tarball(
@@ -63,26 +62,45 @@ impl @mug.TCommand for InstallCmd with execute_async(_, args) {
   )
   let url = "\{base_url}/\{version}/\{tarball_name}"
   let dir = "\{@util.get_version_dir()}/\{version}"
-  println("Downloading \{tarball_name}...")
-  guard @util.download_file(url, dir) is Some(_) else {
-    println("Error downloading Node.js \{version}.")
+  let pb = @mug.ProgressBar::new("Downloading", 0)
+  global_download_pb.val = Some(pb)
+  guard @util.download_file(url, dir, callback=fn(
+      current : UInt64,
+      total : UInt64,
+    ) -> Unit {
+      match global_download_pb.val {
+        Some(pb) => {
+          if pb.total == 0 && total > 0 {
+            pb.set_total(total)
+          }
+          pb.set_position(current)
+          if current == total {
+            pb.finish()
+            global_download_pb.val = None
+          }
+        }
+        None => ()
+      }
+    })
+    is Some(_) else {
+    println(@mug_ansi.red("Error downloading Node.js \{version}."))
     return
   }
-  println("Node.js \{version} installed successfully.")
+  println(@mug_ansi.green("Node.js \{version} installed successfully."))
 }
 
 ///|
-impl @mug.TCommand for InstallCmd with name(self) {
+impl @mug_cli.TCommand for InstallCmd with name(self) {
   self.name
 }
 
 ///|
-impl @mug.TCommand for InstallCmd with description(self) {
+impl @mug_cli.TCommand for InstallCmd with description(self) {
   self.description
 }
 
 ///|
-impl @mug.TCommand for InstallCmd with print_usage(self) {
+impl @mug_cli.TCommand for InstallCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
 }
 

@@ -29,7 +29,6 @@ pub struct App {
 
 ///|
 pub fn App::new(name : String, description : String) -> App {
-  // Initialize i18n with basic English translations
   let basic_translations : Map[String, String] = {
     "help": "Show help information",
     "version": "Show version",

@@ -19,8 +19,12 @@ pub fn create_dir(dir : String) -> Unit raise {
 }
 
 ///|
-pub fn download_file(url : String, file : String) -> Unit? {
-  @ffi.download(url, file)
+pub fn download_file(
+  url : String,
+  file : String,
+  callback~ : FuncRef[(UInt64, UInt64) -> Unit],
+) -> Unit? {
+  @ffi.download(url, file, callback)
 }
 
 ///|

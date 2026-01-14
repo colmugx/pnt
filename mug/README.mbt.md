@@ -24,34 +24,35 @@ moon add colmugx/mug
 ```moonbit
 // main.mbt
 fn main {
-  let app = @app.App::new("mycli", "My CLI tool")
-  app.version("1.0.0")
-
-  // Add your commands
   let hello_cmd = HelloCommand::{}
-  app.add_command(hello_cmd)
 
-  // Execute with command-line arguments
-  let args = @sys.argv.get_view()
-  app.execute(args)
+  @mug.App::new("mycli", "My CLI tool")
+    .version("1.0.0")
+    .add_command(hello_cmd)
+    .execute(@sys.argv.get_view())
 }
 
 // hello_cmd.mbt
 pub struct HelloCommand {}
 
-impl TCommand for HelloCommand with name(_) {
+// Note: Implement TCommand trait (imported via alias if needed, e.g. @mug_cli.TCommand)
+impl @mug.TCommand for HelloCommand with name(_) {
   "hello"
 }
 
-impl TCommand for HelloCommand with description(_) {
+impl @mug.TCommand for HelloCommand with description(_) {
   "Say hello"
 }
 
-impl TCommand for HelloCommand with execute(self, args) {
+impl @mug.TCommand for HelloCommand with execute(self, _args) {
   println("Hello, World!")
 }
 
-impl HelpPrinter for HelloCommand with print_usage(self) {
+impl @mug.TCommand for HelloCommand with execute_async(self, args) {
+  self.execute(args)
+}
+
+impl @mug.TCommand for HelloCommand with print_usage(self) {
   println("  \{self.name()} - \{self.description()}")
 }
 ```
@@ -61,17 +62,11 @@ impl HelpPrinter for HelloCommand with print_usage(self) {
 ### Creating an App
 
 ```moonbit
-// Basic app
-let app = @app.App::new("mycli", "My CLI tool")
-
-// Set version
-app.version("1.0.0")
-
-// Add custom command
-app.add_command(my_command)
-
-// Run
-app.execute(@sys.argv.get_view())
+// Basic app with method chaining
+@mug.App::new("mycli", "My CLI tool")
+  .version("1.0.0")
+  .add_command(my_command)
+  .execute(@sys.argv.get_view())
 ```
 
 ### Internationalization (i18n)
@@ -80,9 +75,9 @@ Mug has built-in i18n support with English and Chinese translations:
 
 ```moonbit
 // Auto-detects system locale
-let app = @app.App::new("mycli", "My CLI tool")
+let app = @mug.App::new("mycli", "My CLI tool")
 
-// Set specific locale
+// Set specific locale (returns new App instance)
 let app_zh = app.with_locale("zh-CN")
 
 // Add custom translations
@@ -100,10 +95,10 @@ let app_with_i18n = app_no_i18n.enable_i18n()
 
 ```moonbit
 pub struct MyCommand {
-  app: @app.App
+  app: @mug.App
 }
 
-impl TCommand for MyCommand with description(self) {
+impl @mug.TCommand for MyCommand with description(self) {
   self.app.i18n.t("my.command.description")
 }
 ```
@@ -115,20 +110,24 @@ impl TCommand for MyCommand with description(self) {
 ```moonbit
 pub struct MyCommand {}
 
-impl TCommand for MyCommand with name(_) {
+impl @mug.TCommand for MyCommand with name(_) {
   "mycommand"
 }
 
-impl TCommand for MyCommand with description(_) {
+impl @mug.TCommand for MyCommand with description(_) {
   "Description of my command"
 }
 
-impl TCommand for MyCommand with execute(self, args) {
+impl @mug.TCommand for MyCommand with execute(self, _args) {
   // Command logic here
   println("Executing my command!")
 }
 
-impl HelpPrinter for MyCommand with print_usage(self) {
+impl @mug.TCommand for MyCommand with execute_async(self, args) {
+  self.execute(args)
+}
+
+impl @mug.TCommand for MyCommand with print_usage(self) {
   println("  \{self.name()} - \{self.description()}")
 }
 ```
@@ -137,10 +136,10 @@ impl HelpPrinter for MyCommand with print_usage(self) {
 
 ```moonbit
 pub struct MyCommand {
-  app: @app.App
+  app: @mug.App
 }
 
-impl TCommand for MyCommand with execute(self, args) {
+impl @mug.TCommand for MyCommand with execute(self, _args) {
   // Can access app properties
   let ver = self.app.version()
   println("App version: \{ver.unwrap_or(\"unknown\")}")
@@ -167,7 +166,7 @@ use @flaggable::FlaggableCommand
 use @flag::Flag
 
 let cmd = FlaggableCommand::new("download", "Download files")
-  |> FlaggableCommand::with_executor(fn(args) {
+  |> FlaggableCommand::with_executor(fn(_args) {
     // Download logic
   })
   |> FlaggableCommand::add_flag_def(Flag::new(
@@ -177,23 +176,45 @@ let cmd = FlaggableCommand::new("download", "Download files")
     type?=FlagType::String
   ))
 
-app.add_command(cmd)
+let app = app.add_command(cmd)
 ```
 
 ### Terminal UI
 
-Use the spinner for progress indication:
+Mug provides rich terminal UI components including Spinners and Progress Bars.
+
+#### Spinner
+
+Use the spinner for indeterminate progress:
 
 ```moonbit
-use @tui::Spinner
-
-let spinner = Spinner::new("Downloading...")
+let spinner = @mug.Spinner::new("Loading...")
 for i in 0..10 {
   spinner.tick()
-  @ffi.sleep(100)
+  // simulate work
 }
-spinner.finish("done")
+spinner.finish("Done!")
 ```
+
+#### Progress Bar
+
+Use the progress bar for determinate progress (e.g. downloads):
+
+```moonbit
+let total = 100UL
+let pb = @mug.ProgressBar::new("Downloading", total)
+
+for i in 0..100 {
+  pb.inc(1UL)
+  // simulate work
+}
+pb.finish()
+```
+
+The progress bar supports:
+- **Custom Styles**: ASCII, Block, or Custom characters
+- **Rich Info**: Speed, ETA, percentage, and data size (MiB/GiB)
+- **Spinner Integration**: Built-in spinner animation
 
 ## Testing
 
@@ -205,11 +226,12 @@ moon test
 
 ## API Documentation
 
-- [@app.App](src/app.mbt) - Main application structure
-- [@command.TCommand](src/command.mbt) - Command trait
-- [@i18n.I18n](src/i18n/api.mbt) - Internationalization
-- [@tui.Spinner](src/tui.mbt) - Terminal UI utilities
-- [@flag.Flag](src/flag.mbt) - Flag definitions
+- [@mug.App](src/cli/app.mbt) - Main application structure
+- [@mug.TCommand](src/cli/command.mbt) - Command trait (via `@mug_cli` alias recommended)
+- [@mug.I18n](src/i18n/api.mbt) - Internationalization
+- [@mug.Spinner](src/tui/spinner.mbt) - Spinner component
+- [@mug.ProgressBar](src/tui/progress_bar.mbt) - Progress Bar component
+- [@mug.Flag](src/cli/flag.mbt) - Flag definitions
 
 ## Examples
 

@@ -1,0 +1,21 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "colmugx/mug/tui"
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Spinner {
+  frames : Array[String]
+  msg : String
+  mut idx : Int
+}
+pub fn Spinner::finish(Self, String) -> Unit
+pub fn Spinner::new(String) -> Self
+pub fn Spinner::tick(Self) -> Unit
+
+// Type aliases
+
+// Traits
+

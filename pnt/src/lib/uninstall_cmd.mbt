@@ -5,7 +5,7 @@ priv struct UninstallCmd {
 }
 
 ///|
-impl @mug.TCommand for UninstallCmd with execute(_, args) {
+impl @mug_cli.TCommand for UninstallCmd with execute(_, args) {
   let version = args[0]
   if version.is_empty() {
     println("Illegal versions.")
@@ -29,22 +29,22 @@ impl @mug.TCommand for UninstallCmd with execute(_, args) {
 }
 
 ///|
-impl @mug.TCommand for UninstallCmd with execute_async(self, args) {
+impl @mug_cli.TCommand for UninstallCmd with execute_async(self, args) {
   self.execute(args)
 }
 
 ///|
-impl @mug.TCommand for UninstallCmd with name(self) {
+impl @mug_cli.TCommand for UninstallCmd with name(self) {
   self.name
 }
 
 ///|
-impl @mug.TCommand for UninstallCmd with description(self) {
+impl @mug_cli.TCommand for UninstallCmd with description(self) {
   self.description
 }
 
 ///|
-impl @mug.TCommand for UninstallCmd with print_usage(self) {
+impl @mug_cli.TCommand for UninstallCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
 }
 

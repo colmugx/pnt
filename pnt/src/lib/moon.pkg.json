@@ -1,7 +1,14 @@
 {
   "import": [
     "colmugx/mug",
-    "colmugx/pnt/util",
-    "moonbitlang/async"
+    {
+      "path": "colmugx/mug/cli",
+      "alias": "mug_cli"
+    },
+    {
+      "path": "colmugx/mug/ansiutils",
+      "alias": "mug_ansi"
+    },
+    "colmugx/pnt/util"
   ]
 }

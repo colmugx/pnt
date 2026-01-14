@@ -1,26 +1,4 @@
 ///|
-pub fn clear_line() -> Unit {
-  println("\r\u001b[K")
-}
-
-///|
-pub fn move_up(n : Int) -> Unit {
-  if n > 0 {
-    println("\u001b[\{n}A")
-  }
-}
-
-///|
-pub fn show_cursor() -> Unit {
-  println("\u001b[?25h")
-}
-
-///|
-pub fn hide_cursor() -> Unit {
-  println("\u001b[?25l")
-}
-
-///|
 pub(all) struct Spinner {
   frames : Array[String]
   msg : String
@@ -48,16 +26,17 @@ pub fn Spinner::tick(self : Spinner) -> Unit {
 
 ///|
 pub fn Spinner::finish(self : Spinner, msg : String) -> Unit {
-  clear_line()
+  mug_print(@ansiutils.clear_line())
   println("✓ \{self.msg} \{msg}")
-  show_cursor()
+  mug_print(@ansiutils.show_cursor())
 }
 
 ///|
-/// Flush standard output - required for proper Spinner animations
-/// FFI implementation provided in stub.c for native targets
-/// For wasm/js targets, this is a no-op as buffering is handled by the runtime
 extern "C" fn mug_fflush_stdout() -> Unit = "mug_fflush_stdout"
+
+///|
+#borrow(str)
+pub extern "C" fn mug_print(str : String) -> Unit = "mug_print"
 
 ///|
 fn flush_stdout() -> Unit {

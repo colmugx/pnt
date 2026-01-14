@@ -46,22 +46,21 @@ async fn use_get_version(tag : String) -> String {
 }
 
 ///|
-impl @mug.TCommand for UseCmd with execute(_, args) {
-  // Synchronous version - cannot call async functions
+impl @mug_cli.TCommand for UseCmd with execute(_, args) {
   ignore(args)
   println("Error: use command requires async context")
 }
 
 ///|
-impl @mug.TCommand for UseCmd with execute_async(_, args) {
+impl @mug_cli.TCommand for UseCmd with execute_async(_, args) {
   let version = use_get_version(args[0])
   if version.is_empty() {
-    println("Error fetching available versions.")
+    println(@mug_ansi.red("Error fetching available versions."))
     return
   }
   if not(@util.is_version_installed(version)) {
     println(
-      "Node.js \{version} is not installed. Install it first with 'pnt install \{version}'",
+      @mug_ansi.yellow("Node.js \{version} is not installed. Install it first with 'pnt install \{version}'"),
     )
     return
   }
@@ -69,13 +68,13 @@ impl @mug.TCommand for UseCmd with execute_async(_, args) {
 
   // 检查二进制执行
   if not(@util.path_is_exist(node_bin)) {
-    println("Node binary not found in \{node_bin}")
+    println(@mug_ansi.red("Node binary not found in \{node_bin}"))
     return
   }
   replace_node_symlinks(version)
   println(
     (
-      $|Now using Node.js \{version}
+      $|Now using Node.js {@mug_ansi.green(version)}
       #|Add this to your shell profile to use pnt:
       $|  export PATH="\{@util.get_bin_dir()}:$PATH"
     ),
@@ -83,17 +82,17 @@ impl @mug.TCommand for UseCmd with execute_async(_, args) {
 }
 
 ///|
-impl @mug.TCommand for UseCmd with name(self) {
+impl @mug_cli.TCommand for UseCmd with name(self) {
   self.name
 }
 
 ///|
-impl @mug.TCommand for UseCmd with description(self) {
+impl @mug_cli.TCommand for UseCmd with description(self) {
   self.description
 }
 
 ///|
-impl @mug.TCommand for UseCmd with print_usage(self) {
+impl @mug_cli.TCommand for UseCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
 }
 

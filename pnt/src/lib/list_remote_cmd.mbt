@@ -8,7 +8,7 @@ priv struct ListRemoteCmd {
 
 ///|
 fn format_version(item : @util.RemoteNode) -> String {
-  let lts = if item.lts is String(s) { "(\{s})" } else { "" }
+  let lts = if item.lts is String(s) { @mug_ansi.cyan("(\{s})") } else { "" }
   "\{item.version} \{lts}"
 }
 
@@ -82,13 +82,12 @@ fn ListRemoteCmd::print_flag_help(self : ListRemoteCmd) -> Unit {
 }
 
 ///|
-impl @mug.TCommand for ListRemoteCmd with execute(_, args) {
+impl @mug_cli.TCommand for ListRemoteCmd with execute(_, args) {
   ignore(args)
 }
 
 ///|
-impl @mug.TCommand for ListRemoteCmd with execute_async(self, args) {
-  // Async version - can call fetch_list
+impl @mug_cli.TCommand for ListRemoteCmd with execute_async(self, args) {
   let list = @util.fetch_list() catch { _ => [] }
   let filtered = if self.has_flag(args, "lts") {
     list.filter(fn(item) {
@@ -105,17 +104,17 @@ impl @mug.TCommand for ListRemoteCmd with execute_async(self, args) {
 }
 
 ///|
-impl @mug.TCommand for ListRemoteCmd with name(self) {
+impl @mug_cli.TCommand for ListRemoteCmd with name(self) {
   self.name
 }
 
 ///|
-impl @mug.TCommand for ListRemoteCmd with description(self) {
+impl @mug_cli.TCommand for ListRemoteCmd with description(self) {
   self.description
 }
 
 ///|
-impl @mug.TCommand for ListRemoteCmd with print_usage(self) {
+impl @mug_cli.TCommand for ListRemoteCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
   self.print_flag_help()
 }

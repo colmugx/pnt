@@ -1,8 +1,4 @@
 ///|
-/// Locale detection utilities
-/// Detects system locale from environment variables
-
-///|
 /// Detect system locale from environment
 /// Priority: LC_ALL > LANG > LC_MESSAGES
 /// Returns locale in format like "zh-CN", "en-US"
@@ -84,11 +80,7 @@ fn map_to_full_locale(lang : String) -> String {
     "zh" => "zh-CN"
     "en" => "en-US"
     "ja" => "ja-JP"
-    "ko" => "ko-KR"
-    "fr" => "fr-FR"
-    "de" => "de-DE"
-    "es" => "es-ES"
-    _ => "\{lang}-\{lang}" // Fallback: en -> en-en
+    _ => "\{lang}" // Fallback: en
   }
 }
 

@@ -1,6 +1,4 @@
 ///|
-/// Public i18n API - Wrapper around Reader Monad
-/// Provides simple interface for internationalization
 pub struct I18n {
   priv config : I18nConfig
   priv enabled : Bool
@@ -8,7 +6,6 @@ pub struct I18n {
 
 ///|
 /// Create i18n instance with auto-detected locale
-/// Defaults to enabled, will detect system locale
 pub fn I18n::new() -> Result[I18n, I18NError] {
   let locale = detect_locale()
   try {
@@ -34,7 +31,6 @@ pub fn I18n::with_locale(locale : String) -> Result[I18n, I18NError] {
 
 ///|
 /// Create i18n instance with custom translations
-/// Useful for applications to provide their own translations
 pub fn I18n::with_translations(
   locale : String,
   translations : Map[String, String],
@@ -143,8 +139,6 @@ fn merge_maps(
 }
 
 ///|
-/// Get English fallback translation for common keys
-/// Returns the key itself if no English translation is available
 fn get_english_fallback(key : String) -> String {
   let english_translations = {
     "help": "Show help information",

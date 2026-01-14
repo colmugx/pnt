@@ -19,19 +19,11 @@ pub(all) enum FlagError {
 ///|
 /// Type-safe flag operations trait
 pub(open) trait TFlaggable {
-  /// Get a string flag value
   get_flag_string(Self, Array[String], String) -> Result[String, FlagError]
-
-  /// Get an int flag value
   get_flag_int(Self, Array[String], String) -> Result[Int, FlagError]
-
-  /// Get a multiple-value flag
   get_flag_multiple(Self, Array[String], String) -> Array[String]
-
-  /// Print flag help
   print_flag_help(Self) -> Unit
 }
 
 ///|
-/// Type alias for command arguments
 pub type TArgs = ArrayView[String]

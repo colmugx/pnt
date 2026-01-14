@@ -80,7 +80,6 @@ impl TCommand for FlaggableCommand with print_usage(self) {
 }
 
 ///|
-/// Parse flags from arguments
 fn parse_command_flags(args : Array[String], flags : Array[Flag]) -> ParsedArgs {
   // Build flag map
   let flag_map : Map[String, Flag] = Map::new()

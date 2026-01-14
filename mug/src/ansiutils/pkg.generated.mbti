@@ -1,0 +1,20 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "colmugx/mug/ansiutils"
+
+// Values
+pub fn clear_line() -> Unit
+
+pub fn hide_cursor() -> Unit
+
+pub fn move_up(Int) -> Unit
+
+pub fn show_cursor() -> Unit
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

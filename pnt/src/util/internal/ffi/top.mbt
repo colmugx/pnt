@@ -87,18 +87,12 @@ extern "C" fn download_file_ffi(
 ) -> Unit? = "zig_download_file"
 
 ///|
-pub fn download(url : String, file : String) -> Unit? {
-  download_file_ffi(url |> ToCStr::to_cstr, file |> ToCStr::to_cstr, fn(
-    current,
-    total,
-  ) {
-    print_ffi(
-      "Downloading: \{sprint(current.to_double()/total.to_double(), 2)}%",
-    )
-    if current == total {
-      println("")
-    }
-  })
+pub fn download(
+  url : String,
+  file : String,
+  callback : FuncRef[(UInt64, UInt64) -> Unit],
+) -> Unit? {
+  download_file_ffi(url |> ToCStr::to_cstr, file |> ToCStr::to_cstr, callback)
 }
 
 ///|
