@@ -21,11 +21,16 @@ impl @mug.TCommand for UninstallCmd with execute(_, args) {
     )
     return
   }
-  if @util.remove_by_version?(version).is_err() {
+  if (try? @util.remove_by_version(version)) is Err(_) {
     println("Error removing \{version}")
     return
   }
   println("Node.js \{version} uninstalled successfully")
+}
+
+///|
+impl @mug.TCommand for UninstallCmd with execute_async(self, args) {
+  self.execute(args)
 }
 
 ///|
@@ -39,7 +44,7 @@ impl @mug.TCommand for UninstallCmd with description(self) {
 }
 
 ///|
-impl @mug.HelpPrinter for UninstallCmd with print_usage(self) {
+impl @mug.TCommand for UninstallCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
 }
 

@@ -1,0 +1,41 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "colmugx/pnt/util/internal/ffi"
+
+// Values
+pub fn create_symlink(String, String) -> Unit raise
+
+pub fn download(String, String) -> Unit?
+
+pub fn get_arch() -> String
+
+pub fn get_error_message() -> String
+
+pub fn get_os() -> String
+
+pub fn get_term_size() -> (Int, Int)?
+
+pub fn is_interactive() -> Bool
+
+pub fn read_link(String) -> String raise
+
+// Errors
+pub suberror IOError {
+  IOError(String)
+}
+pub impl Show for IOError
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+pub(open) trait FromCStr {
+  from_cstr(Self) -> String
+}
+pub impl FromCStr for Bytes
+
+pub(open) trait ToCStr {
+  to_cstr(Self) -> Bytes
+}
+pub impl ToCStr for String
+

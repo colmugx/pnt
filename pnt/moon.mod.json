@@ -1,11 +1,12 @@
 {
   "name": "colmugx/pnt",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "deps": {
-    "moonbitlang/x": "0.4.25",
+    "moonbitlang/x": "0.4.38",
     "colmugx/mug": {
       "path": "../mug"
-    }
+    },
+    "moonbitlang/async": "0.16.0"
   },
   "readme": "README.md",
   "repository": "Node Toolkit in MoonBit",
@@ -17,5 +18,6 @@
     "nrm"
   ],
   "description": "",
-  "source": "src"
+  "source": "src",
+  "preferred-target": "native"
 }

@@ -1,10 +1,70 @@
 const std = @import("std");
 const util = @import("util.zig");
-const os = @import("os.zig");
-const request = @import("request.zig");
+const fs = std.fs;
 const http = std.http;
 
-const DownloadError = request.HttpError;
+pub const HttpError = error{
+    // --- 输入/配置错误 ---
+    /// URL 格式无效
+    InvalidUrl,
+    /// 文件路径无效（如果需要检查）
+    InvalidFilePath,
+
+    // --- 网络/HTTP 错误 ---
+    /// DNS 解析失败
+    DnsResolveFailed,
+    /// 连接被拒绝、超时、重置等 TPC/TLS 层错误
+    ConnectionFailed,
+    /// 发送请求体或完成请求时出错
+    HttpRequestSendFailed,
+    /// 响应未完整接收（如意外 EOF）
+    HttpResponseIncomplete,
+    /// （如果可区分）请求超时
+    HttpTimeout,
+    /// HTTP 状态码不是 2xx
+    HttpStatusNotSuccess,
+    /// 解析响应头失败
+    HttpHeaderParseFailed,
+    /// 响应体超出预期大小
+    HttpResponseTooLarge,
+
+    // --- 数据处理错误 ---
+    /// 读取响应体时出错
+    ResponseBodyReadFailed,
+    /// 响应体格式错误（例如，期望 JSON 但解析失败）
+    ResponseFormatError,
+    /// 内存分配或转换响应体到 slice 失败
+    ResponseConversionFailed,
+    /// Gzip 解压缩失败
+    DecompressionFailed,
+    /// Tar 解包失败（头错误、校验和、内容错误）
+    ArchiveExtractionFailed,
+
+    // --- 文件系统错误 ---
+    /// 无法打开目标目录（不存在、权限、不是目录）
+    CannotOpenTargetDirectory,
+    /// 写入文件到磁盘时出错
+    FileSystemWriteError,
+
+    // --- 资源错误 ---
+    /// 内存分配失败
+    OutOfMemory,
+
+    /// --- FFI 错误 ---
+    FFIStringConversionFailed,
+};
+
+fn open_folder(absolute_path: []const u8) !fs.Dir {
+    return fs.openDirAbsolute(absolute_path, .{ .access_sub_paths = true }) catch |err| switch (err) {
+        error.FileNotFound => {
+            try fs.makeDirAbsolute(absolute_path);
+            return fs.openDirAbsolute(absolute_path, .{ .access_sub_paths = true });
+        },
+        else => return err,
+    };
+}
+
+const DownloadError = HttpError;
 
 // 进度阅读器
 const ProgressReader = struct {
@@ -115,7 +175,7 @@ fn downloadAndExtractTarGz(
         .callback = callback,
     };
 
-    var folder = try os.open_folder(target_dir_path);
+    var folder = try open_folder(target_dir_path);
     defer folder.close();
 
     var br = std.io.bufferedReaderSize(std.crypto.tls.max_ciphertext_record_len, progress_reader.reader());

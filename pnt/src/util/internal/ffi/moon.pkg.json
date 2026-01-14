@@ -2,7 +2,11 @@
   "import": [
     "moonbitlang/x/encoding"
   ],
-  "targets": {
-    "ffi_native.mbt": ["native"]
+  "link": {
+    "native": {
+      "native-stub": [
+        "stub.c"
+      ]
+    }
   }
 }

@@ -1,8 +1,8 @@
 {
-  "supported-targets": ["native"],
   "import": [
     "colmugx/pnt/util/internal/ffi",
     "moonbitlang/x/fs",
+    "moonbitlang/async/http",
     "moonbitlang/x/sys"
   ],
   "pre-build": [

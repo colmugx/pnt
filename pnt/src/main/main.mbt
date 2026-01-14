@@ -1,11 +1,11 @@
 ///|
-pub fn moonbit_main() -> Unit {
+pub async fn moonbit_main() -> Unit {
   let args = @sys.get_cli_args()
   guard args is [_, .. args]
   @lib.execute(args)
 }
 
 ///|
-fn main {
+async fn main {
   moonbit_main()
 }

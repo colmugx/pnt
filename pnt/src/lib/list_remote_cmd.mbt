@@ -8,28 +8,28 @@ priv struct ListRemoteCmd {
 
 ///|
 fn format_version(item : @util.RemoteNode) -> String {
-  let lts = item.lts.as_string().map_or("", fn { s => "(\{s})" })
+  let lts = if item.lts is String(s) { "(\{s})" } else { "" }
   "\{item.version} \{lts}"
 }
 
 ///|
 fn ListRemoteCmd::parse_flags(
   self : ListRemoteCmd,
-  args : @mug.TArgs
+  args : ArrayView[String],
 ) -> Map[String, String] {
   let parsed : Map[String, String] = {}
   let mut i = 0
   while i < args.length() {
     let arg = args[i]
     if arg.has_prefix("--") {
-      let start = arg.offset_of_nth_char(2).unwrap()
-      let end = arg.offset_of_nth_char(arg.length() - 1).unwrap()
-      let long = arg.view(start_offset=start, end_offset=end + 1).to_string()
+      let start = 2
+      let end = arg.length()
+      let long = arg.substring(start~, end~)
       if self.flags.contains(long) {
         parsed.set(long, "--\{long}")
       }
     } else if arg.has_prefix("-") && arg.length() > 1 {
-      let short = arg[1].to_string()
+      let short = arg.substring(start=1, end=2)
       guard self.s_flags.get(short) is Some(long) else {
         i += 1
         continue
@@ -42,7 +42,7 @@ fn ListRemoteCmd::parse_flags(
 }
 
 ///|
-impl @mug.TFlaggable for ListRemoteCmd with add_flag(self, flag) {
+fn ListRemoteCmd::add_flag(self : ListRemoteCmd, flag : @mug.Flag) -> Unit {
   self.flags.set(flag.name, flag)
   if flag.short is Some(s) {
     self.s_flags.set(s, flag.name)
@@ -50,33 +50,58 @@ impl @mug.TFlaggable for ListRemoteCmd with add_flag(self, flag) {
 }
 
 ///|
-impl @mug.TFlaggable for ListRemoteCmd with has_flag(self, args, key) {
+fn ListRemoteCmd::has_flag(
+  self : ListRemoteCmd,
+  args : ArrayView[String],
+  key : String,
+) -> Bool {
   let parsed_flags = self.parse_flags(args)
-  for name in parsed_flags.keys() {
-    if self.flags.contains(name) && name == key {
-      return true
-    }
-  }
-  false
+  parsed_flags.contains(key)
 }
 
 ///|
-impl @mug.TCommand for ListRemoteCmd with execute(self, args) {
-  match @util.fetch_list?() {
-    Err(err) => println(err)
-    Ok(list) => {
-      let list = list.rev()
-      let filtered = if self.has_flag(args, "lts") {
-        list.filter(fn {
-          item =>
-            item.lts.as_string().map_or(false, fn { s => not(s.is_empty()) })
-        })
-      } else {
-        list
+fn ListRemoteCmd::print_flag_help(self : ListRemoteCmd) -> Unit {
+  println("Flags:")
+  let keys = self.flags.keys().to_array()
+  let mut i = 0
+  while i < keys.length() {
+    let name = keys[i]
+    match self.flags.get(name) {
+      Some(flag) => {
+        let short_str = match flag.short {
+          Some(s) => " -\{s}"
+          None => ""
+        }
+        println("  --\{name}\{short_str}")
+        println("    \{flag.description}")
       }
-      filtered.each(fn { item => println(format_version(item)) })
+      None => ()
     }
+    i = i + 1
   }
+}
+
+///|
+impl @mug.TCommand for ListRemoteCmd with execute(_, args) {
+  ignore(args)
+}
+
+///|
+impl @mug.TCommand for ListRemoteCmd with execute_async(self, args) {
+  // Async version - can call fetch_list
+  let list = @util.fetch_list() catch { _ => [] }
+  let filtered = if self.has_flag(args, "lts") {
+    list.filter(fn(item) {
+      if item.lts is String(s) {
+        not(s.is_empty())
+      } else {
+        false
+      }
+    })
+  } else {
+    list
+  }
+  filtered.each(fn(item) { println(format_version(item)) })
 }
 
 ///|
@@ -90,8 +115,9 @@ impl @mug.TCommand for ListRemoteCmd with description(self) {
 }
 
 ///|
-impl @mug.HelpPrinter for ListRemoteCmd with print_usage(self) {
+impl @mug.TCommand for ListRemoteCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
+  self.print_flag_help()
 }
 
 ///|

@@ -11,8 +11,9 @@ pub(open) trait ToCStr {
 ///|
 pub impl FromCStr for Bytes with from_cstr(self) {
   let decoder = @encoding.decoder(@encoding.UTF8)
-  guard decoder.decode?(self) is Ok(str) else { "" }
-  str
+  decoder.decode(self) catch {
+    _ => ""
+  }
 }
 
 ///|

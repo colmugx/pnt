@@ -1,5 +1,5 @@
 ///|
-priv type! VersionError
+priv suberror VersionError
 
 ///|
 priv struct InstallCmd {
@@ -7,19 +7,23 @@ priv struct InstallCmd {
   description : String
 }
 
-///| 获取版本号
-fn get_version!(tag : String) -> String {
+///|
+/// 获取版本号
+async fn install_get_version(tag : String) -> String {
   guard tag is "lts" || tag is "latest" else { @util.normalize_version(tag) }
-  let list = @util.fetch_list!()
+  let list = @util.fetch_list() catch { _ => [] }
   match tag {
     "lts" => {
-      let latest_lts = list
+      guard list
         .iter()
-        .find_first(fn {
-          item =>
-            item.lts.as_string().map_or(false, fn { s => not(s.is_empty()) })
+        .find_first(fn(item) {
+          if item.lts is String(s) {
+            not(s.is_empty())
+          } else {
+            false
+          }
         })
-        .unwrap()
+        is Some(latest_lts)
       let version = @util.normalize_version(latest_lts.version)
       println("Latest LTS version is \{version}")
       version
@@ -35,8 +39,15 @@ fn get_version!(tag : String) -> String {
 
 ///|
 impl @mug.TCommand for InstallCmd with execute(_, args) {
+  // Synchronous version - cannot call async functions
+  ignore(args)
+  println("Error: install command requires async context")
+}
+
+///|
+impl @mug.TCommand for InstallCmd with execute_async(_, args) {
   let base_url = "https://nodejs.org/dist"
-  let version = get_version?(args[0]).or(String::default())
+  let version = install_get_version(args[0])
   if version.is_empty() {
     println("Error fetching available versions.")
     return
@@ -71,7 +82,7 @@ impl @mug.TCommand for InstallCmd with description(self) {
 }
 
 ///|
-impl @mug.HelpPrinter for InstallCmd with print_usage(self) {
+impl @mug.TCommand for InstallCmd with print_usage(self) {
   println("  \{self.name} - \{self.description}")
 }
 

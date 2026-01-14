@@ -1,0 +1,68 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "colmugx/pnt/util"
+
+import(
+  "moonbitlang/core/json"
+)
+
+// Values
+pub fn create_dir(String) -> Unit raise
+
+pub fn download_file(String, String) -> Unit?
+
+pub async fn fetch_list() -> Array[RemoteNode] raise FetchListError
+
+pub fn format_node_tarball(os_tag~ : String, cpu_arch~ : String, version~ : String) -> String
+
+pub fn get_app_dir() -> String
+
+pub fn get_arch() -> String
+
+pub fn get_bin_dir() -> String
+
+pub fn get_current_version() -> String?
+
+pub fn get_home() -> String
+
+pub fn get_os() -> String
+
+pub fn get_version() -> String
+
+pub fn get_version_dir() -> String
+
+pub fn is_version_installed(String) -> Bool
+
+pub fn list_node() -> Array[String]
+
+pub fn normalize_version(String) -> String
+
+pub fn path_is_exist(String) -> Bool
+
+pub fn read_config() -> Json raise ReadModError
+
+pub fn remove_all(String) -> Unit raise
+
+pub fn remove_by_version(String) -> Unit raise
+
+pub fn replace_symlink(String, String) -> Unit
+
+// Errors
+type FetchListError
+pub impl Show for FetchListError
+
+type ReadModError
+
+// Types and methods
+pub struct RemoteNode {
+  version : String
+  date : String
+  files : Array[String]
+  lts : Json
+  security : Bool
+}
+pub impl @json.FromJson for RemoteNode
+
+// Type aliases
+
+// Traits
+

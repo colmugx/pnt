@@ -1,44 +1,50 @@
 ///|
-type! FetchListError String derive(Show)
+suberror FetchListError {
+  FetchListError(String)
+} derive(Show)
 
 ///|
 pub struct RemoteNode {
   version : String
   date : String
   files : Array[String]
-  lts : @json.JsonValue
+  lts : Json
   security : Bool
-} derive(@json.FromJson)
+} derive(@json.FromJson, ToJson)
 
 ///|
-pub fn fetch_list() -> Array[RemoteNode]!FetchListError {
+pub async fn fetch_list() -> Array[RemoteNode] raise FetchListError {
   let list_url = "https://nodejs.org/dist/index.json"
-  let resp = try @ffi.get!(list_url) catch {
-    @ffi.NetworkError(err) => raise FetchListError(err)
-    _ => ""
+  let (_, body) = @http.get(list_url) catch {
+    _ => raise FetchListError("http request failed")
   }
-  guard @json.parse?(resp) is Ok(json) else {
-    raise FetchListError("parse json failed.")
+  let json = body.json() catch { _ => raise FetchListError("read body failed") }
+  let data = @json.from_json(json) catch {
+    _ => raise FetchListError("convert json failed.")
   }
-  guard @json.from_json?(json) is Ok(data) else {
-    raise FetchListError("convert json failed.")
-  }
-  let data : Array[RemoteNode] = data
   data
 }
 
 ///|
 pub fn list_node() -> Array[String] {
-  @fs.read_dir?(get_version_dir()).or([])
+  @fs.read_dir(get_version_dir()) catch {
+    _ => []
+  }
 }
 
 ///|
-pub fn get_current_version() -> @string.StringView? {
+pub fn get_current_version() -> String? {
   let path = "\{get_bin_dir()}/node"
-  let ori_path = @ffi.read_link(path)
+  let ori_path = @ffi.read_link(path) catch { _ => return None }
   ori_path
   .split("/")
-  .find_first(fn { item => item is ['v', c, ..] && c.is_ascii_digit() })
+  .find_first(fn(item) {
+    item.has_prefix("v") &&
+    item.length() > 1 &&
+    item[1] >= '0' &&
+    item[1] <= '9'
+  })
+  .map(fn(s) { s.to_string() })
 }
 
 ///|
@@ -47,9 +53,9 @@ pub fn is_version_installed(ver : String) -> Bool {
 }
 
 ///|
-pub fn remove_by_version(ver : String) -> Unit! {
+pub fn remove_by_version(ver : String) -> Unit raise {
   let path = "\{get_version_dir()}/\{ver}"
-  @ffi.remove_dir!(path)
+  remove_all(path)
 }
 
 ///|
@@ -68,7 +74,7 @@ pub fn normalize_version(ver : String) -> String {
 pub fn format_node_tarball(
   os_tag~ : String,
   cpu_arch~ : String,
-  version~ : String
+  version~ : String,
 ) -> String {
   "node-\{version}-\{os_tag}-\{cpu_arch}.tar.gz"
 }

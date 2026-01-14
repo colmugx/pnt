@@ -1,7 +1,7 @@
 ///|
 pub fn get_home() -> String {
   let env_map = @sys.get_env_vars()
-  env_map.get("HOME").or("")
+  env_map.get("HOME").unwrap_or("")
 }
 
 ///|
@@ -11,11 +11,11 @@ pub fn get_app_dir() -> String {
 }
 
 ///|
-pub fn create_dir(dir : String) -> Unit! {
+pub fn create_dir(dir : String) -> Unit raise {
   if @fs.path_exists(dir) {
     return
   }
-  @fs.create_dir!(dir)
+  @fs.create_dir(dir)
 }
 
 ///|
@@ -34,9 +34,13 @@ pub fn replace_symlink(binary : String, version : String) -> Unit {
   let target_path = "\{version_bin_path}/\{binary}"
   let symlink_path = "\{get_bin_dir()}/\{binary}"
   if @fs.path_exists(symlink_path) {
-    @fs.remove_file?(symlink_path).unwrap()
+    @fs.remove_file(symlink_path) catch {
+      _ => ()
+    }
   }
-  @ffi.create_symlink(target_path, symlink_path)
+  @ffi.create_symlink(target_path, symlink_path) catch {
+    _ => println("Failed to create symlink for \{binary}")
+  }
 }
 
 ///|

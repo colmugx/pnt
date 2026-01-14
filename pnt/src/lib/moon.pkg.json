@@ -1,6 +1,7 @@
 {
   "import": [
     "colmugx/mug",
-    "colmugx/pnt/util"
+    "colmugx/pnt/util",
+    "moonbitlang/async"
   ]
 }
